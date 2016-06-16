@@ -1,0 +1,50 @@
+[09:34:50 - AWT-EventQueue-0] [Cooja.java:2856] [INFO] - External tools default settings: /external_tools_linux.config
+[09:34:50 - AWT-EventQueue-0] [Cooja.java:2886] [INFO] - External tools user settings: /home/user/.cooja.user.properties
+[09:35:13 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
+[09:35:13 - AWT-EventQueue-0] [Visualizer.java:256] [INFO] - Registered external visualizer: org.contikios.cooja.plugins.skins.DGRMVisualizerSkin
+[09:35:31 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make example-broadcast.sky TARGET=sky 
+[09:35:48 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make clean TARGET=sky 
+[09:35:49 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make example-broadcast.sky TARGET=sky 
+[09:35:58 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/example-broadcast.sky
+[09:35:59 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/example-broadcast.sky
+[09:36:18 - Thread-1] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465691778896
+[09:36:23 - Thread-1] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465691783428	Duration: 4532 ms	Simulated time 155652 ms	Ratio 34.34510150044131
+[09:50:34 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
+[09:50:44 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[09:50:46 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[09:51:28 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[09:51:31 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[09:51:34 - Thread-4] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465692694507
+[09:51:44 - Thread-4] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465692704823	Duration: 10316 ms	Simulated time 155463 ms	Ratio 15.070085304381543
+[09:57:32 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
+[09:57:40 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[09:57:43 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[09:58:00 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[09:58:02 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[09:58:06 - Thread-7] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465693086790
+[09:58:09 - Thread-7] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465693089107	Duration: 2317 ms	Simulated time 38312 ms	Ratio 16.535174794993527
+[09:58:21 - Thread-8] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465693101472
+[09:58:28 - Thread-8] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465693108203	Duration: 6731 ms	Simulated time 136944 ms	Ratio 20.345268162234436
+[10:33:57 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
+[10:34:05 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[10:34:07 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[10:34:26 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[10:34:29 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[10:34:32 - Thread-11] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465695272862
+[10:34:44 - Thread-11] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465695284008	Duration: 11146 ms	Simulated time 157499 ms	Ratio 14.13054010407321
+[10:34:51 - Thread-12] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465695291821
+[10:34:59 - Thread-12] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465695299863	Duration: 8042 ms	Simulated time 243680 ms	Ratio 30.30092016911216
+[10:36:44 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
+[10:37:12 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[10:37:14 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[10:37:30 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[10:37:32 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[10:37:37 - Thread-15] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465695457293
+[10:37:52 - Thread-15] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465695472639	Duration: 15346 ms	Simulated time 201680 ms	Ratio 13.14218688909162
+[10:43:15 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
+[10:43:32 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[10:43:34 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[10:43:48 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
+[10:43:50 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
+[10:43:54 - Thread-18] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465695834402
+[10:44:05 - Thread-18] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465695845263	Duration: 10861 ms	Simulated time 148667 ms	Ratio 13.688150262406776

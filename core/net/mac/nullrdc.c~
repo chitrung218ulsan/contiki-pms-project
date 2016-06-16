@@ -1,0 +1,1772 @@
+/*
+ * Copyright (c) 2010, Swedish Institute of Computer Science.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the Institute nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * This file is part of the Contiki operating system.
+ *
+ */
+
+/**
+ * \file
+ *         A null RDC implementation that uses framer for headers.
+ * \author
+ *         Adam Dunkels <adam@sics.se>
+ *         Niclas Finne <nfi@sics.se>
+ */
+
+//#include "ssma_sensor.h"
+
+#include "net/mac/nullrdc.h"
+extern uint32_t nullrdc_pms_count_sent;
+extern uint16_t num_superframe;
+extern uint8_t indexmBSS;
+extern uint8_t numTries;
+extern uint8_t orphan_count;
+
+/*
+#include "net/rime/ssma_sensor.h"
+#if RM_SCD
+    #include "dev/IR_Process.h"
+#endif
+
+*/
+
+
+
+#include "net/rime/ftsp.h"
+//#include "net/rime/ssma_neighbor.h"
+#include "net/packetbuf.h"
+#include "net/queuebuf.h"
+#include "net/netstack.h"
+#include "net/rime/rimestats.h"
+#include "sys/rtimer.h"
+#include "dev/radio.h"
+#include <string.h>
+#include "lib/memb.h"
+#include "lib/random.h"
+
+#include "dev/watchdog.h"
+//#include "dev/cc2420.h"
+#include "net/rime/device-module-cc26xx.h"
+
+#if PMS_SCD
+#include "dev/PMC_SCD.h"
+#endif
+
+#if RM_SCD
+#include "dev/IR_Process.h"
+extern uint16_t cycleCount;
+#endif
+
+extern uint8_t time_attach; // Variable is declared in cc2420 file
+
+#if CONTIKI_TARGET_COOJA
+#include "lib/simEnvChange.h"
+#endif /* CONTIKI_TARGET_COOJA */
+
+#define DEBUG 1
+#if DEBUG
+#include <stdio.h>
+#define PRINTF(...) printf(__VA_ARGS__)
+#else
+#define PRINTF(...)
+#endif
+
+
+#ifdef NULLRDC_CONF_ADDRESS_FILTER
+#define NULLRDC_ADDRESS_FILTER NULLRDC_CONF_ADDRESS_FILTER
+#else
+#define NULLRDC_ADDRESS_FILTER 1
+#endif /* NULLRDC_CONF_ADDRESS_FILTER */
+
+#ifndef NULLRDC_802154_AUTOACK
+#ifdef NULLRDC_CONF_802154_AUTOACK
+#define NULLRDC_802154_AUTOACK NULLRDC_CONF_802154_AUTOACK
+#else
+#define NULLRDC_802154_AUTOACK 0
+#endif /* NULLRDC_CONF_802154_AUTOACK */
+#endif /* NULLRDC_802154_AUTOACK */
+
+#ifndef NULLRDC_802154_AUTOACK_HW
+#ifdef NULLRDC_CONF_802154_AUTOACK_HW
+#define NULLRDC_802154_AUTOACK_HW NULLRDC_CONF_802154_AUTOACK_HW
+#else
+#define NULLRDC_802154_AUTOACK_HW 0
+#endif /* NULLRDC_CONF_802154_AUTOACK_HW */
+#endif /* NULLRDC_802154_AUTOACK_HW */
+
+#if NULLRDC_802154_AUTOACK
+#include "sys/rtimer.h"
+#include "dev/watchdog.h"
+
+#ifdef NULLRDC_CONF_ACK_WAIT_TIME
+#define ACK_WAIT_TIME NULLRDC_CONF_ACK_WAIT_TIME
+#else /* NULLRDC_CONF_ACK_WAIT_TIME */
+#define ACK_WAIT_TIME                      RTIMER_SECOND / 2500
+#endif /* NULLRDC_CONF_ACK_WAIT_TIME */
+
+
+#ifdef NULLRDC_CONF_AFTER_ACK_DETECTED_WAIT_TIME
+#define AFTER_ACK_DETECTED_WAIT_TIME NULLRDC_CONF_AFTER_ACK_DETECTED_WAIT_TIME
+#else /* NULLRDC_CONF_AFTER_ACK_DETECTED_WAIT_TIME */
+#define AFTER_ACK_DETECTED_WAIT_TIME       1500
+#endif /* NULLRDC_CONF_AFTER_ACK_DETECTED_WAIT_TIME */
+#endif /* NULLRDC_802154_AUTOACK */
+
+#ifdef NULLRDC_CONF_SEND_802154_ACK
+#define NULLRDC_SEND_802154_ACK NULLRDC_CONF_SEND_802154_ACK
+#else /* NULLRDC_CONF_SEND_802154_ACK */
+#define NULLRDC_SEND_802154_ACK 0
+#endif /* NULLRDC_CONF_SEND_802154_ACK */
+
+#if NULLRDC_SEND_802154_ACK
+#include "net/mac/frame802154.h"
+#endif /* NULLRDC_SEND_802154_ACK */
+
+#define ACK_LEN 3
+
+
+
+#if NULLRDC_802154_AUTOACK || NULLRDC_802154_AUTOACK_HW
+struct seqno {
+  linkaddr_t sender;
+  uint8_t seqno;
+};
+
+#ifdef NETSTACK_CONF_MAC_SEQNO_HISTORY
+#define MAX_SEQNOS NETSTACK_CONF_MAC_SEQNO_HISTORY
+#else /* NETSTACK_CONF_MAC_SEQNO_HISTORY */
+#define MAX_SEQNOS 8
+#endif /* NETSTACK_CONF_MAC_SEQNO_HISTORY */
+
+static struct seqno received_seqnos[MAX_SEQNOS];
+#endif /* NULLRDC_802154_AUTOACK || NULLRDC_802154_AUTOACK_HW */
+
+/*
+ * Trung added
+ */
+
+#ifdef NULLRDC_CONF_CCA_COUNT_MAX
+#define CCA_COUNT_MAX                      (NULLRDC_CONF_CCA_COUNT_MAX)
+#else
+#define CCA_COUNT_MAX                      2
+#endif
+
+#ifdef NULLRDC_CONF_CCA_CHECK_TIME
+#define CCA_CHECK_TIME                     (CNULLRDC_CONF_CCA_CHECK_TIME)
+#else
+#define CCA_CHECK_TIME                     RTIMER_ARCH_SECOND / 8192
+#endif
+
+/* CCA_SLEEP_TIME is the time between two successive CCA checks. */
+/* Add 1 when rtimer ticks are coarse */
+#if RTIMER_ARCH_SECOND > 8000
+#define CCA_SLEEP_TIME                     RTIMER_ARCH_SECOND / 2000
+#else
+#define CCA_SLEEP_TIME                     (RTIMER_ARCH_SECOND / 2000) + 1
+#endif
+
+/* CHECK_TIME is the total time it takes to perform CCA_COUNT_MAX
+   CCAs. */
+#define CHECK_TIME                         (CCA_COUNT_MAX * (CCA_CHECK_TIME + CCA_SLEEP_TIME))
+
+/* Before starting a transmission, nullRdc checks the availability
+   of the channel with CCA_COUNT_MAX_TX consecutive CCAs */
+#ifdef NULLRDC_CONF_CCA_COUNT_MAX_TX
+#define CCA_COUNT_MAX_TX                   (NULLRDC_CONF_CCA_COUNT_MAX_TX)
+#else
+#define CCA_COUNT_MAX_TX                   6
+#endif
+
+
+
+// Mungtv
+#define RTS_WAIT_TIME	500//RTIMER_SECOND
+#define AFTER_ACK_DETECTED_WAIT_TIME	0//1500
+MEMB(packet_memb, struct rdc_buf_list, 1);
+MEMB(metadata_memb, struct ssma_qbuf_metadata, 1);
+//LIST(packet_list);
+
+static struct struct_ssma_rdc_str ssma_rdc;
+//static SsmaRdcTimer ssma_timer;
+
+#include "timesynch.h"
+#include "sys/clock.h"
+struct rdc_buf_list *current_data;
+
+
+//struct qbuf_metadata *current_metadata;
+
+uint8_t RTS_SEQ = 0;
+rtimer_clock_t wt1;
+struct ssma_rts
+{
+	uint8_t seq;
+};
+/*---------------------------------------------------------------------------*/
+static int
+send_one_packet(mac_callback_t sent, void *ptr)
+{
+  int ret;
+  int last_sent_ok = 0;
+
+  //////
+  if(packetbuf_attr(PACKETBUF_ATTR_EPACKET_TYPE) ==  PACKETBUF_ATTR_PACKET_TYPE_SSMA_DATA && packetbuf_attr(PACKETBUF_ATTR_PACKET_TYPE) == PACKETBUF_ATTR_PACKET_TYPE_DATA)
+  {
+	 // PRINTF("Packet size %u \n", packetbuf_datalen());
+	  // No child = 12, One child = 24, 2 children = 36, 3 children = 48
+	  //if(packetbuf_datalen() > 40)
+	  {
+		  ssma_rdc.number_call_one++;
+		//PRINTF("Nullrdc: Send one data packet \n");
+
+		ssma_rdc.isSendData = 0;
+
+		free_current_packet();
+
+		current_data = memb_alloc(&packet_memb);
+		current_data->ptr = memb_alloc(&metadata_memb);
+
+		current_data->buf = queuebuf_new_from_packetbuf();
+
+		linkaddr_copy(&ssma_rdc.currentNextHopAddress, packetbuf_addr(PACKETBUF_ADDR_RECEIVER));
+		ssma_rdc.data_size = packetbuf_datalen();
+
+		RTS_SEQ = packetbuf_attr(PACKETBUF_ATTR_EPACKET_ID);
+
+		if(current_data->buf != NULL)
+		{
+			 struct ssma_qbuf_metadata *metadata = (struct ssma_qbuf_metadata *)current_data->ptr;
+			/* Neighbor and packet successfully allocated */
+			if(packetbuf_attr(PACKETBUF_ATTR_MAX_MAC_TRANSMISSIONS) == 0) {
+			  /* Use default configuration for max transmissions */
+				metadata->max_transmissions = SSMA_RDC_MAX_MAC_TRANSMISSIONS;
+			} else {
+				metadata->max_transmissions = packetbuf_attr(PACKETBUF_ATTR_MAX_MAC_TRANSMISSIONS);
+			}
+			metadata->sent = sent;
+			metadata->cptr = ptr;
+			if( ssma_rdc.isSendingPeriod == 1 && ssma_rdc.isSendData == 0)
+			{
+				SsmaRdcPassive();
+			}
+		}
+		else
+		{
+			PRINTF("Nullrdc: Send List error create new queuebuf \n");
+		}
+		return 1;
+	  }
+  }
+  packetbuf_set_addr(PACKETBUF_ADDR_SENDER, &linkaddr_node_addr);
+#if NULLRDC_802154_AUTOACK || NULLRDC_802154_AUTOACK_HW
+  packetbuf_set_attr(PACKETBUF_ATTR_MAC_ACK, 1);
+#endif /* NULLRDC_802154_AUTOACK || NULLRDC_802154_AUTOACK_HW */
+
+  if(NETSTACK_FRAMER.create() < 0) {
+    /* Failed to allocate space for headers */
+    PRINTF("nullrdc: send failed, too large header\n");
+    ret = MAC_TX_ERR_FATAL;
+  } else {
+
+#ifdef NETSTACK_ENCRYPT
+    NETSTACK_ENCRYPT();
+#endif /* NETSTACK_ENCRYPT */
+
+#if NULLRDC_802154_AUTOACK
+    int is_broadcast;
+    uint8_t dsn;
+    dsn = ((uint8_t *)packetbuf_hdrptr())[2] & 0xff;
+
+    NETSTACK_RADIO.prepare(packetbuf_hdrptr(), packetbuf_totlen());
+    is_broadcast = linkaddr_cmp(packetbuf_addr(PACKETBUF_ADDR_RECEIVER),
+                                &linkaddr_null);
+
+    if(NETSTACK_RADIO.receiving_packet() ||
+       (!is_broadcast && NETSTACK_RADIO.pending_packet())) {
+
+      /* Currently receiving a packet over air or the radio has
+         already received a packet that needs to be read before
+         sending with auto ack. */
+      ret = MAC_TX_COLLISION;
+    } else {
+      if(!is_broadcast) {
+        RIMESTATS_ADD(reliabletx);
+      }
+
+      switch(NETSTACK_RADIO.transmit(packetbuf_totlen())) {
+      case RADIO_TX_OK:
+        if(is_broadcast) {
+          ret = MAC_TX_OK;
+        } else {
+          rtimer_clock_t wt;
+
+          /* Check for ack */
+          wt = RTIMER_NOW();
+          watchdog_periodic();
+          while(RTIMER_CLOCK_LT(RTIMER_NOW(), wt + ACK_WAIT_TIME)) {
+#if CONTIKI_TARGET_COOJA
+            simProcessRunValue = 1;
+            cooja_mt_yield();
+#endif /* CONTIKI_TARGET_COOJA */
+          }
+
+          ret = MAC_TX_NOACK;
+          if(NETSTACK_RADIO.receiving_packet() ||
+             NETSTACK_RADIO.pending_packet() ||
+             NETSTACK_RADIO.channel_clear() == 0) {
+            int len;
+            uint8_t ackbuf[ACK_LEN];
+
+            if(AFTER_ACK_DETECTED_WAIT_TIME > 0) {
+              wt = RTIMER_NOW();
+              watchdog_periodic();
+              while(RTIMER_CLOCK_LT(RTIMER_NOW(),
+                                    wt + AFTER_ACK_DETECTED_WAIT_TIME)) {
+      #if CONTIKI_TARGET_COOJA
+                  simProcessRunValue = 1;
+                  cooja_mt_yield();
+      #endif /* CONTIKI_TARGET_COOJA */
+              }
+            }
+
+            if(NETSTACK_RADIO.pending_packet()) {
+              len = NETSTACK_RADIO.read(ackbuf, ACK_LEN);
+              if(len == ACK_LEN && ackbuf[2] == dsn) {
+                /* Ack received */
+                RIMESTATS_ADD(ackrx);
+                ret = MAC_TX_OK;
+              } else {
+                /* Not an ack or ack not for us: collision */
+                ret = MAC_TX_COLLISION;
+              }
+            }
+          } else {
+	    PRINTF("nullrdc tx noack\n");
+	  }
+        }
+        break;
+      case RADIO_TX_COLLISION:
+        ret = MAC_TX_COLLISION;
+        break;
+      default:
+        ret = MAC_TX_ERR;
+        break;
+      }
+    }
+
+#else /* ! NULLRDC_802154_AUTOACK */
+   if(NETSTACK_RADIO.receiving_packet() || NETSTACK_RADIO.pending_packet())
+    {
+    	ret = MAC_TX_COLLISION;
+    }
+	switch(NETSTACK_RADIO.send(packetbuf_hdrptr(), packetbuf_totlen())) {
+		case RADIO_TX_OK:
+		  ret = MAC_TX_OK;
+		  break;
+		case RADIO_TX_COLLISION:
+			//ret = MAC_TX_COLLISION;
+			if(packetbuf_attr(PACKETBUF_ATTR_EPACKET_TYPE) ==  PACKETBUF_ATTR_PACKET_TYPE_SSMA_DATA &&
+					packetbuf_attr(PACKETBUF_ATTR_PACKET_TYPE) == PACKETBUF_ATTR_PACKET_TYPE_ACK)
+			{
+				rtimer_clock_t t0;
+				t0 = RTIMER_NOW() + 2 + random_rand()%10;
+				while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+
+				switch(NETSTACK_RADIO.send(packetbuf_hdrptr(), packetbuf_totlen())) {
+					case RADIO_TX_OK:
+						ret = MAC_TX_OK;
+						break;
+					case RADIO_TX_COLLISION:
+						ret = MAC_TX_COLLISION;
+						break;
+					case RADIO_TX_NOACK:
+						ret = MAC_TX_NOACK;
+						break;
+					default:
+						ret = MAC_TX_ERR;
+						break;
+				}
+			}
+			else{
+				ret = MAC_TX_COLLISION;
+			}
+		  break;
+		case RADIO_TX_NOACK:
+		  ret = MAC_TX_NOACK;
+		  break;
+		default:
+			if(packetbuf_attr(PACKETBUF_ATTR_EPACKET_TYPE) ==  PACKETBUF_ATTR_PACKET_TYPE_SSMA_DATA &&
+								packetbuf_attr(PACKETBUF_ATTR_PACKET_TYPE) == PACKETBUF_ATTR_PACKET_TYPE_ACK)
+			{
+				rtimer_clock_t t0;
+				t0 = RTIMER_NOW() + 2 + random_rand()%10;
+				while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+
+				switch(NETSTACK_RADIO.send(packetbuf_hdrptr(), packetbuf_totlen())) {
+					case RADIO_TX_OK:
+						ret = MAC_TX_OK;
+						break;
+					case RADIO_TX_COLLISION:
+						ret = MAC_TX_COLLISION;
+						break;
+					case RADIO_TX_NOACK:
+						ret = MAC_TX_NOACK;
+						break;
+					default:
+						ret = MAC_TX_ERR;
+						break;
+				}
+			}
+			else{
+				ret = MAC_TX_ERR;
+			}
+		  //ret = MAC_TX_ERR;
+		  break;
+		}
+#endif /* ! NULLRDC_802154_AUTOACK */
+  }
+  if(ret == MAC_TX_OK) {
+    last_sent_ok = 1;
+  }
+  mac_call_sent_callback(sent, ptr, ret, 1);
+  return last_sent_ok;
+}
+
+static void SsmaDataXmit()
+{
+  int ret;
+
+  packetbuf_clear();
+  //packetbuf_clear_hdr();
+  queuebuf_to_packetbuf(current_data->buf);
+
+  if(NETSTACK_FRAMER.create() < 0){
+    /* Failed to allocate space for headers */
+    PRINTF("nullrdc: send DataXmit failed, too large header\n");
+    ret = MAC_TX_ERR_FATAL;
+  } else {
+
+    /*if(NETSTACK_RADIO.receiving_packet() || NETSTACK_RADIO.pending_packet())
+    {
+    	ret = MAC_TX_COLLISION;
+    }*/
+    //else
+    {
+    	//uint16_t totalLength = packetbuf_totlen();
+		//uint8_t packetTemp [totalLength];
+		////packetbuf_copyto(packetTemp);
+    	ssma_rdc.state = SSMA_RDC_S_IN_XMITING_UNICAST;
+
+    	//switch(NETSTACK_RADIO.send(packetTemp, totalLength)){
+    	switch(NETSTACK_RADIO.send(packetbuf_hdrptr(), packetbuf_totlen())){
+    	    case RADIO_TX_OK:
+				ret = MAC_TX_OK;
+				ssma_rdc.number_data_sent++;
+				ssma_rdc.isSendData = 1;
+				break;
+    	    case RADIO_TX_COLLISION:
+				ret = MAC_TX_COLLISION;
+
+				rtimer_clock_t t0;
+				t0 = RTIMER_NOW() + 2 + random_rand()%200; //random_rand()%20;
+				while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+
+		    	switch(NETSTACK_RADIO.send(packetbuf_hdrptr(), packetbuf_totlen())){
+				//switch(NETSTACK_RADIO.send(packetTemp, totalLength)){
+					case RADIO_TX_OK:
+					  ret = MAC_TX_OK;
+					  ssma_rdc.number_data_sent++;
+					  ssma_rdc.isSendData = 1;
+					  break;
+					default:
+						ssma_rdc.number_data_fail++;
+						break;
+				}
+    	      break;
+    	    case RADIO_TX_NOACK:
+				ret = MAC_TX_NOACK;
+				break;
+    	    default:
+				ret = MAC_TX_ERR;
+				{
+				rtimer_clock_t t0;
+				t0 = RTIMER_NOW() + 2 + random_rand()%20;
+				while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+		    	switch(NETSTACK_RADIO.send(packetbuf_hdrptr(), packetbuf_totlen())){
+				//switch(NETSTACK_RADIO.send(packetTemp, totalLength)){
+					case RADIO_TX_OK:
+					  ret = MAC_TX_OK;
+					  ssma_rdc.number_data_sent++;
+					  ssma_rdc.isSendData = 1;
+					  break;
+					default:
+						ssma_rdc.number_data_fail++;
+						break;
+				}
+				}
+				break;
+    	}
+    }
+	ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+  }
+
+  free_current_packet();
+
+  packetbuf_set_attr( PACKETBUF_ATTR_EPACKET_TYPE, PACKETBUF_ATTR_PACKET_TYPE_SSMA_DATA);
+
+  struct ssma_qbuf_metadata *metadata = (struct ssma_qbuf_metadata *)current_data->ptr;
+  mac_call_sent_callback(metadata->sent, metadata->cptr, ret, 1);
+}
+/*---------------------------------------------------------------------------*/
+static void
+send_packet(mac_callback_t sent, void *ptr)
+{
+  send_one_packet(sent, ptr);
+}
+/*---------------------------------------------------------------------------*/
+static void SsmaRdcSetState(int state)
+{
+	 ssma_rdc.state = state;
+}
+/*---------------------------------------------------------------------------*/
+static void SsmaRdcPassive()
+{
+	ssma_rdc.number_call_passive++;
+	if (ssma_rdc.state != SSMA_RDC_S_PASSIVE)
+    {
+		PRINTF("Passive,not at PASSIVE \n");
+        return;
+    }
+
+	if(current_data->buf != NULL && ssma_rdc.isSendingPeriod == 1 && ssma_rdc.isSendData == 0)
+	//if(ssma_rdc.isSendingPeriod == 1 && ssma_rdc.isSendData == 0)
+	{
+		SsmaRdcSendRts();
+	}
+	else if(ssma_rdc.isSendingPeriod == 0)
+	{
+		PRINTF("Nullrdc: Not in Sending Period \n");
+	}
+	else if(current_data->buf == NULL)
+	{
+		PRINTF("Nullrdc: buff null \n");
+	}
+	else if(ssma_rdc.isSendData != 0)
+	{
+		PRINTF("Nullrdc:isSendData %u \n", ssma_rdc.isSendData);
+	}
+}
+
+static void SsmaRdcLayer(void *ptr){
+	ssma_rdc.timer.isRunning = 0;
+	ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+	/*
+	if( ssma_rdc.isSendingPeriod == 0)
+	{
+		return;
+	}
+	*/
+	switch(ssma_rdc.timer.flag)
+	{
+		case SSMA_RDC_T_RTS:
+		{
+			if(ssma_rdc.rts_count <= 2)
+			{
+				if( ssma_rdc.isSendingPeriod == 1 && ssma_rdc.isSendData == 0)
+				{
+					SsmaRdcPassive();
+				}
+			}
+			else
+			{
+				ssma_rdc.rts_count = 0;
+
+				free_current_packet();
+
+				int ret = MAC_TX_COLLISION;
+				packetbuf_set_attr( PACKETBUF_ATTR_EPACKET_TYPE, PACKETBUF_ATTR_PACKET_TYPE_SSMA_DATA);
+				struct ssma_qbuf_metadata *metadata = (struct ssma_qbuf_metadata *)current_data->ptr;
+				mac_call_sent_callback(metadata->sent, metadata->cptr, ret, 1);
+
+/*
+					ssma_rdc.timer.flag = SSMA_RDC_T_CANCEL;
+					ssma_rdc.state = SSMA_RDC_S_XMIT;
+					SsmaDataXmit();// Send data packet at current_data location
+*/
+
+			}
+			break;
+		}
+		case SSMA_RDC_T_REMOTE:
+		{
+			if( ssma_rdc.isSendingPeriod == 1 && ssma_rdc.isSendData == 0)
+			{
+				SsmaRdcPassive();
+			}
+			break;
+		}
+		default:
+			if( ssma_rdc.isSendingPeriod == 1 && ssma_rdc.isSendData == 0)
+			{
+				SsmaRdcPassive();
+			}
+			break;
+	}
+}
+/*---------------------------------------------------------------------------*/
+static void SsmaRdcCancelTimer( uint8_t timerType)
+{
+	SsmaRdcSetTimer( SSMA_RDC_T_CANCEL, 1);
+}
+/*---------------------------------------------------------------------------*/
+static void SsmaRdcSetTimer( uint8_t timerType, uint8_t timerValue)
+{
+	ssma_rdc.timer.isRunning = 1;
+	ssma_rdc.timer.seq++;
+	ssma_rdc.timer.flag = timerType;
+
+	ctimer_stop(&ssma_rdc.timer.back_off_ctimer);
+
+	ctimer_set(&ssma_rdc.timer.back_off_ctimer, timerValue, SsmaRdcLayer, NULL);
+}
+/*****************************************************************************/
+
+static void SsmaRdcSendRts(){
+
+	ssma_rdc.rts_call++;
+
+	struct ssma_rdc_hdr hdr;
+	rtimer_clock_t t0;
+
+	int rtsLength = sizeof(struct ssma_rdc_hdr);
+	uint8_t rts[rtsLength];
+
+	//Copy some information into hdr
+	hdr.frameType = SSMA_RDC_RTS;
+    hdr.tickDelay = 2;//8 --> 99%
+
+    linkaddr_copy(&hdr.srcAddr, &linkaddr_node_addr);
+    linkaddr_copy(&hdr.destAddr, &ssma_rdc.currentNextHopAddress);
+    memcpy(rts,&hdr,rtsLength);
+    //
+
+    int i;
+	uint8_t collision = 0;
+	// Check CCA
+
+	for(i = 0; i <6; ++i)
+	{
+	  t0 = RTIMER_NOW();
+
+	  #if CCA_CHECK_TIME > 0
+	  	  while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0 + CCA_CHECK_TIME)) { }
+	  #endif
+	  if(NETSTACK_RADIO.channel_clear() == 0)
+	  {
+		collision++;
+		break;
+	  }
+	  t0 = RTIMER_NOW();
+	  while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0 + CCA_SLEEP_TIME)) { }
+	}
+
+	//Finishing checking CCA
+    if(collision == 0)
+    {
+    	if(ssma_rdc.timer.isRunning)
+    	{
+    		return;
+    	}
+    	switch(NETSTACK_RADIO.send(rts, rtsLength)){
+			case RADIO_TX_OK:
+			{
+			  ssma_rdc.rts_count++;
+			  ssma_rdc.number_rts_sent++;
+			  ssma_rdc.state = SSMA_RDC_S_RTS;
+			  SsmaRdcSetTimer( SSMA_RDC_T_RTS, 2);//+ 1*ssma_rdc.rts_count);//2
+			  break;
+			}
+			default:
+			{
+			  ssma_rdc.number_rts_fail++;
+			  ssma_rdc.state = SSMA_RDC_S_RTS;
+			  //SsmaRdcSetTimer( SSMA_RDC_T_RTS, 4);//4
+
+			  SsmaRdcSetTimer( SSMA_RDC_T_RTS, 2);//+ 1*ssma_rdc.rts_count);//2
+			  break;
+			}
+    	 }
+    }
+    else
+    {
+    	//t0 = RTIMER_NOW() + 2 + random_rand()%100;
+    	//while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+		//SsmaRdcSetTimer( SSMA_RDC_T_RTS, 4);//4
+
+		ssma_rdc.state = SSMA_RDC_S_RTS;
+    	//ssma_rdc.state = SSMA_RDC_S_REMOTE;
+		SsmaRdcSetTimer( SSMA_RDC_T_REMOTE, 2);//+ 1*ssma_rdc.rts_count);//2
+    }
+}
+/*---------------------------------------------------------------------------*/
+static void SsmaRdcSendCts(linkaddr_t destAddr, uint8_t tickDelay){
+	if(ssma_rdc.isSendingPeriod == 1)
+	{
+		return; // No response CTS at sending period
+	}
+	struct ssma_rdc_hdr hdr;
+	int ctsLength = sizeof(struct ssma_rdc_hdr);
+	uint8_t cts[ctsLength];
+
+	//Copy some information into hdr
+	hdr.frameType = SSMA_RDC_CTS;
+	hdr.tickDelay = tickDelay - 1;
+	linkaddr_copy(&hdr.srcAddr, &linkaddr_node_addr);
+	linkaddr_copy(&hdr.destAddr, &destAddr);
+
+	memcpy(cts, &hdr, ctsLength);
+
+	ssma_rdc.state = SSMA_RDC_S_IN_XMITING_CTS;
+
+	switch(NETSTACK_RADIO.send(cts, ctsLength)){
+		case RADIO_TX_OK:
+		{
+		    ssma_rdc.number_cts_sent++;
+		    SsmaRdcSetTimer( SSMA_RDC_T_REMOTE, tickDelay);
+		    break;
+		}
+		default:
+		{
+			rtimer_clock_t t0;
+			t0 = RTIMER_NOW() + 2 + random_rand()%10;
+			while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+
+			switch(NETSTACK_RADIO.send(cts, ctsLength)){
+				case RADIO_TX_OK:
+				{
+					ssma_rdc.number_cts_sent++;
+					SsmaRdcSetTimer( SSMA_RDC_T_REMOTE, tickDelay);
+					break;
+				}
+				default:
+				{
+					ssma_rdc.timer.isRunning = 0;
+					ssma_rdc.number_cts_fail++;
+					break;
+				}
+			}
+		}
+	}
+
+	ssma_rdc.state = SSMA_RDC_S_REMOTE;
+}
+/*---------------------------------------------------------------------------*/
+static void send_list(mac_callback_t sent, void *ptr, struct rdc_buf_list *buf_list)
+{
+	return;
+}
+/*---------------------------------------------------------------------------*/
+static void SsmaRdcRemote(struct ssma_rdc_hdr controlHeader, linkaddr_t fromAddr, linkaddr_t toAddr)
+{
+	uint8_t rt_for;
+	switch(controlHeader.frameType)
+	{
+		case SSMA_RDC_RTS:
+		{
+			if(linkaddr_cmp(&toAddr, &linkaddr_node_addr))
+			{
+				ssma_rdc.number_rts_receive++;
+				if(ssma_rdc.timer.isRunning == 0)
+				{
+					ssma_rdc.timer.isRunning = 1;
+					SsmaRdcSendCts(fromAddr , controlHeader.tickDelay);
+				}
+			}
+			else
+			{
+				if(linkaddr_node_addr.u8[0] == 1)
+				{ // Sink node
+					ssma_rdc.timer.isRunning = 0;
+					ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+					break;
+				}
+				// Overheard RTS --> Hold until other's CTS and DATA to be finished
+				rt_for = controlHeader.tickDelay ;//+ random_rand() % 4  ;//random_rand() % 4;
+				ssma_rdc.number_rts_overheard++;
+
+				rtimer_clock_t t0;
+		    	t0 = RTIMER_NOW() + 2 + random_rand()%200;
+		    	while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+
+				SsmaRdcSetTimer(SSMA_RDC_T_REMOTE, rt_for); // Set timer to wait
+			}
+			break;
+		}
+		case SSMA_RDC_CTS:
+		{
+			if(linkaddr_node_addr.u8[0] == 1)
+			{ // Sink node
+				ssma_rdc.timer.isRunning = 0;
+				ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+				break;
+			}
+			/*
+			if(linkaddr_cmp(&toAddr, &linkaddr_node_addr))
+			{
+				ssma_rdc.number_cts_receive++;
+				ssma_rdc.timer.flag = SSMA_RDC_T_CANCEL;
+				ssma_rdc.state = SSMA_RDC_S_XMIT;
+				SsmaDataXmit();// Send data packet at current_data location
+			}
+			else
+			*/
+			{
+				// Overheard CTS or Receive CTS in state different with SSMA_RDC_S_RTS
+				ssma_rdc.number_cts_overheard++;
+				rt_for = controlHeader.tickDelay;//+ random_rand() % 4 ;//random_rand() % 4;
+
+				rtimer_clock_t t0;
+				t0 = RTIMER_NOW() + 2+ random_rand()%200;
+				while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+
+				SsmaRdcSetTimer(SSMA_RDC_T_REMOTE, rt_for); // Set timer to wait
+			}
+			break;
+		}
+		default: break;
+	}/* End Switch */
+
+}
+uint32_t countRM = 0;
+/*---------------------------------------------------------------------------*/
+static void packet_input(void)
+{
+  int original_datalen;
+
+
+
+  original_datalen = packetbuf_datalen();
+  uint8_t first_byte ;
+  //PRINTF("NULLRDC, packet_input -----data_len: %d \n",original_datalen);
+
+  uint8_t * original_dataptr = (uint8_t*)packetbuf_dataptr();
+
+  first_byte = *((uint8_t *)packetbuf_dataptr()); // Get first byte value of packet
+  PRINTF("Nullrdc: First byte receives %u \n", first_byte);
+
+#ifdef NETSTACK_DECRYPT
+    NETSTACK_DECRYPT();
+#endif /* NETSTACK_DECRYPT */
+
+#if NULLRDC_802154_AUTOACK
+  if(packetbuf_datalen() == ACK_LEN) {
+    /* Ignore ack packets */
+    PRINTF("nullrdc: ignored ack\n");
+  } else
+#endif /* NULLRDC_802154_AUTOACK */
+
+	  if(first_byte != DATA_RESPONSE && original_datalen == (sizeof(struct ssma_rdc_hdr)))
+	  	{
+	  		struct ssma_rdc_hdr controlHeader;
+	  		packetbuf_copyto(&controlHeader);
+
+	  		if(controlHeader.frameType != SSMA_RDC_CTS && controlHeader.frameType != SSMA_RDC_RTS)
+	  		{
+	  			return;
+	  		}
+
+	  		linkaddr_t fromAddr;
+	  		linkaddr_copy( &fromAddr, &controlHeader.srcAddr);
+	  		linkaddr_t toAddr;
+	  		linkaddr_copy( &toAddr, &controlHeader.destAddr);
+
+	  		switch( ssma_rdc.state)
+	  		{
+	  			case SSMA_RDC_S_RTS:
+	  			{
+	  				if( (controlHeader.frameType == SSMA_RDC_CTS))
+	  				{
+	  					ssma_rdc.number_cts_receive++;
+	  					ssma_rdc.timer.flag = SSMA_RDC_T_CANCEL;
+	  					ssma_rdc.state = SSMA_RDC_S_XMIT;
+	  					SsmaDataXmit();// Send data packet at current_data location
+	  				}
+	  				else
+	  				{
+	  					ssma_rdc.state = SSMA_RDC_S_REMOTE;
+	  					SsmaRdcRemote(controlHeader, fromAddr, toAddr);
+	  				}
+	  				break;
+	  			}
+	  			case SSMA_RDC_S_PASSIVE:
+	  			case SSMA_RDC_S_BACKOFF:
+	  			case SSMA_RDC_S_REMOTE:
+	  			{
+	  				ssma_rdc.state = SSMA_RDC_S_REMOTE;
+	  				SsmaRdcRemote(controlHeader, fromAddr, toAddr);
+	  				break;
+	  			}
+	  			default:
+	  				PRINTF("Nullrdc: Receive packet type %d at unknown state %d \n", controlHeader.frameType, ssma_rdc.state);
+
+	  				ssma_rdc.state = SSMA_RDC_S_REMOTE;
+	  				SsmaRdcRemote(controlHeader, fromAddr, toAddr);
+	  				break;
+	  		}/* end switch*/
+	  		return;
+	  	}
+//#if SRT_SCD || RM_SCD
+	  	else if( first_byte == COMMAND_TYPE && original_datalen > 20)
+	  	{
+			if(linkaddr_node_addr.u8[0] != 1)
+			{
+				packetbuf_copyto(&receiveControlMsg);
+				commandPktSize = original_datalen;
+
+				totalReceiveCount++;
+#if SRT_SCD
+				if(isReceivingCommandPeriod == 1 || isReceivingCommandPeriod == 2)
+				{
+					isReceiveBroadcast = 1;
+					orphan_count = 0;
+					cmdCount++;
+
+					if(isReceivingCommandPeriod == 1)
+					{
+						NETSTACK_RADIO.off();
+					}
+
+					if(ssmab_index == 0) // First receiving time in current superframe
+					{
+						ssmab_index = 1;
+						// for time synchronization work, execute here
+/*
+#if RM_SCD
+						UpdateStatus(1);
+#endif
+*/
+						// For debug
+						PRINTF("Receive command \n");
+#endif
+#if PMS_SCD
+						uint8_t numberNodeId = (original_datalen - 21)/2;
+						uint8_t i = 0;
+						uint8_t index = 1;
+						for(; i < numberNodeId; i++)
+						{
+							//PRINTF("Command Type %u, Node Id %d \n", *((uint8_t*)(receiveControlMsg+index)), *((uint8_t*)(receiveControlMsg+index+1)));
+							if(*((uint8_t*)(receiveControlMsg+index+1)) == linkaddr_node_addr.u8[0] && ssmab_index == 0)
+							{
+								ssmab_index = 1;
+								uint8_t commandType = *((uint8_t*)(receiveControlMsg+index));
+								if(commandType == (uint8_t)PMS_CMD_ON)
+								{
+									//ProcessStandbyMode();
+
+									PRINTF("PMS receive turn on \n");
+
+									// send to RM to turn on device
+									PRINTF("nullRdc: PMS sends ACK to RM to turn on device \n");
+									uint8_t ackdata[2] = {0, 0};
+									ackdata[0] = RM_COMMAND_ACK;
+									ackdata[1] = linkaddr_node_addr.u8[0];
+									nullRdc_motes_send_command(ackdata,2);
+									PRINTF("nullRdc: commandType=%d \n",commandType);
+								}
+								else if( commandType == (uint8_t)PMS_CMD_OFF)
+								{
+									ProcessCutOffMode();
+									PRINTF("PMS receive turn off \n");
+								}
+								PRINTF(" RM_SCD receive command and do job here (Insert call function here) \n");
+							}
+							index+=2;
+						}
+#endif
+#if SRT_SCD
+					}
+					/*
+					if(receiveControlMsg.frameType == 102)
+					{
+						// Perform synchronization time processing
+						if(last_command_seq != receiveControlMsg.seq)
+						{
+							ftsp_maintain_syn(receiveControlMsg.src, (unsigned long)receiveControlMsg.global_time);
+						}
+					}
+					*/
+				}
+#endif
+			}
+			return;
+	  	}
+#if PMS_SCD
+	  	else if(first_byte == HD_COMMAND || first_byte == RM_COMMAND)
+	  	{
+	  		//send ack to confirm
+	  		uint8_t ackdata[2] = {0, 0};
+	  		if(first_byte == HD_COMMAND)
+	  		{
+
+	  			uint8_t dataReceived[3];
+	  			packetbuf_copyto(dataReceived);
+	  			//call function to record data
+	  			hd_NodeId = dataReceived[1];
+	  			if(room_status == 1 && dataReceived[2] == 2)
+	  			{
+	  				// have person -> no person
+	  				PRINTF("nullRdc: Pms receives message from HD, no person -> cutoff \n");
+
+	  				ProcessCutOffMode();
+	  			}
+	  			room_status = dataReceived[2];
+	  			PRINTF("nullRdc: Pms receives message from HD node %d, roomStatus: %d \n",hd_NodeId,room_status);
+	  			ackdata[0] = HD_COMMAND_ACK;
+	  		}
+	  		else if(first_byte == RM_COMMAND)
+	  		{
+	  			PRINTF("nullRdc: Pms receives message from RM node \n");
+	  			ackdata[0] = RM_COMMAND_ACK;
+
+	  			//call function to connect standby power
+	  		}
+
+			ackdata[1] = linkaddr_node_addr.u8[0];
+			nullRdc_motes_send_command(ackdata,2);
+	  		return;
+	  	}
+
+#endif
+
+#if PMS_SCD || TEST_CODE
+	  	else if(first_byte == DATA_REQUEST)
+	  	{
+	  		ssmab_index = 0;
+	  		// send roomStatus and power consumption to sensor router
+	  		PRINTF("nullRdc: Pms receives data request from Anchor node \n");
+	  		nullRdc_pms_send_data();
+	  		return;
+	  	}
+	  	else if (first_byte == HD_ROOM_STATUS)
+	  	{
+
+	  		// sending ACK
+	  		uint8_t ackdata[2] = {0, 0};
+	  		ackdata[0] = HD_COMMAND_ACK;
+	  		ackdata[1] = linkaddr_node_addr.u8[0];
+	  		NETSTACK_RADIO.send(ackdata, 2);
+	  		//////////////////////////////////////////////////////////////
+	  		struct hd_message_str messagePtr;
+	  		packetbuf_copyto(&messagePtr);
+
+	  		//device_module_PMS_update_Room_Status_From_HD(&messagePtr);
+	  		return;
+	  	}
+#endif
+
+#if RM_SCD
+	  	else if(first_byte == RM_COMMAND_ACK)
+	  	{
+	  		//if node is RM_SCD
+	  		// call function to send IR Communication
+	  		PRINTF("nullRdc: RM receives ACK from pms node to turn on device \n");
+	  		//SetTemp25(Hauzen);
+	  		return;
+	  	}
+	  	else if(first_byte == PMS_COMMAND_IR_OFF_TV_REQ || first_byte == PMS_COMMAND_IR_ON_TV_REQ)
+		{
+			//if node is RM_SCD
+			// call function to send IR Communication
+			//PRINTF("nullRdc: RM receives PMS_COMMAND_IR_OFF_TV_REQ from pms node to turn off device \n");
+
+	  		// For Test, mungtv
+	  		//rtimer_clock_t rt_now;
+	  		//rt_now = RTIMER_NOW();
+	  		if(cycleCount % 300 != 0)
+	  		{
+	  			TurnOFFCC2420();
+
+	  		}
+	  		countRM++;
+	  		PRINTF("nullRdc RM receive command %u \n", countRM);
+
+	  		device_mode_RM_send_IR_TV(PMS_COMMAND_IR_ON_TV_REQ);
+
+
+
+			return;
+		}
+#endif
+#if HD_SCD
+	  	else if(first_byte == HD_COMMAND_ACK)
+	  	{
+	  		//if node is RM_SCD
+	  		// call function to send IR Communication
+	  		PRINTF("nullRdc: HD receives HD_COMMAND_ACK from pms node \n");
+	  		return;
+	  	}
+#endif
+
+#if ANCHOR_SCD
+	  	else if(first_byte == DATA_RESPONSE)
+	  	{
+	  		// save data
+	  		struct pms_message pmsPtr;
+	  		packetbuf_copyto(&pmsPtr);
+	  		if(srt_hd_count >=3 || srt_pms_count>=3)
+	  		{
+	  			PRINTF("nullRdc: srt_hd_count >=3 \n");
+				PRINTF("nullRdc: Anchor node receives data response, hdnodeId: %d, roomStatus: %d, pmsNodeId: %d, pmsPower: %d \n",
+						pmsPtr.hdNodeId,pmsPtr.roomStatus,pmsPtr.pmsNodeId,pmsPtr.powerConsumption	);
+	  			return;
+	  		}
+	  		//srt_hd_type[srt_hd_count] = HD_DATA_TYPE;
+	  		if(srt_hd_count < 1)
+	  		{
+				srt_hd_nodeId[srt_hd_count] = pmsPtr.hdNodeId;
+				srt_hd_roomStatus[srt_hd_count] = pmsPtr.roomStatus;
+				srt_hd_count++;
+	  		}
+	  		if(linkaddr_node_addr.u8[0] == 10 && (pmsPtr.pmsNodeId == 35 || pmsPtr.pmsNodeId == 27 || pmsPtr.pmsNodeId == 4))
+			{
+	  			srt_pms_nodeId[srt_pms_count] = pmsPtr.pmsNodeId;
+				srt_pms_powerConsumption[srt_pms_count] = pmsPtr.powerConsumption;
+				srt_pms_count++;
+			}
+
+	  		else if(linkaddr_node_addr.u8[0] == 19 && (pmsPtr.pmsNodeId == 25 || pmsPtr.pmsNodeId == 14 || pmsPtr.pmsNodeId == 8))
+	  		{
+	  			srt_pms_nodeId[srt_pms_count] = pmsPtr.pmsNodeId;
+				srt_pms_powerConsumption[srt_pms_count] = pmsPtr.powerConsumption;
+				srt_pms_count++;
+	  		}
+	  		//srt_pms_type[srt_pms_count] = PMS_DATA_TYPE;
+
+
+			PRINTF("nullRdc: Anchor node receives data response, hdnodeId: %d, roomStatus: %d, pmsNodeId: %d, pmsPower: %d \n",
+					pmsPtr.hdNodeId,pmsPtr.roomStatus,pmsPtr.pmsNodeId,pmsPtr.powerConsumption	);
+	  		return;
+	  	}
+#endif
+//#endif
+
+  if(NETSTACK_FRAMER.parse() < 0)
+  {
+#if NULLRDC_ADDRESS_FILTER
+  }
+  else if(!linkaddr_cmp(packetbuf_addr(PACKETBUF_ADDR_RECEIVER),
+                                         &linkaddr_node_addr) &&
+            !linkaddr_cmp(packetbuf_addr(PACKETBUF_ADDR_RECEIVER),
+                          &linkaddr_null)) {
+    PRINTF("nullrdc: not for us\n");
+#endif /* NULLRDC_ADDRESS_FILTER */
+  }
+  else {
+    int duplicate = 0;
+
+#if NULLRDC_802154_AUTOACK || NULLRDC_802154_AUTOACK_HW
+    /* Check for duplicate packet by comparing the sequence number
+       of the incoming packet with the last few ones we saw. */
+    int i;
+    for(i = 0; i < MAX_SEQNOS; ++i) {
+      if(packetbuf_attr(PACKETBUF_ATTR_PACKET_ID) == received_seqnos[i].seqno &&
+         linkaddr_cmp(packetbuf_addr(PACKETBUF_ADDR_SENDER),
+                      &received_seqnos[i].sender)) {
+        /* Drop the packet. */
+        PRINTF("nullrdc: drop duplicate link layer packet %u\n",
+               packetbuf_attr(PACKETBUF_ATTR_PACKET_ID));
+        duplicate = 1;
+      }
+    }
+    if(!duplicate) {
+      for(i = MAX_SEQNOS - 1; i > 0; --i) {
+        memcpy(&received_seqnos[i], &received_seqnos[i - 1],
+               sizeof(struct seqno));
+      }
+      received_seqnos[0].seqno = packetbuf_attr(PACKETBUF_ATTR_PACKET_ID);
+      linkaddr_copy(&received_seqnos[0].sender,
+                    packetbuf_addr(PACKETBUF_ADDR_SENDER));
+    }
+#endif /* NULLRDC_802154_AUTOACK */
+
+#if NULLRDC_SEND_802154_ACK
+    {
+      frame802154_t info154;
+      frame802154_parse(original_dataptr, original_datalen, &info154);
+      if(info154.fcf.frame_type == FRAME802154_DATAFRAME &&
+         info154.fcf.ack_required != 0 &&
+         linkaddr_cmp((linkaddr_t *)&info154.dest_addr,
+                      &linkaddr_node_addr)) {
+        uint8_t ackdata[ACK_LEN] = {0, 0, 0};
+
+        ackdata[0] = FRAME802154_ACKFRAME;
+        ackdata[1] = 0;
+        ackdata[2] = info154.seq;
+        NETSTACK_RADIO.send(ackdata, ACK_LEN);
+      }
+    }
+#endif /* NULLRDC_SEND_ACK */
+    if(!duplicate) {
+      NETSTACK_MAC.input();
+    }
+  }
+}
+
+void free_current_packet()
+{
+	queuebuf_free(current_data->buf);
+	memb_free(&metadata_memb, current_data->ptr);
+	memb_free(&packet_memb, current_data);
+}
+
+void initCyclePeriod()
+{
+	free_current_packet();
+	ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+	ssma_rdc.rts_count = 0;
+	ssma_rdc.isSendingPeriod = 0;
+	ssma_rdc.isSendData = 0;
+
+	ssma_rdc.timer.isRunning = 0;
+
+	PRINTF("Nullrdc: Statistic: rts_c %u, rts_s %u, rts_r %u, rts_o %u, rts_f %u, cts_s %u, cts_r %u, cts_o %u, cts_f %u, data_s %u, data_f %u, c_o %u, c_p %u \n",
+			ssma_rdc.rts_call, ssma_rdc.number_rts_sent, ssma_rdc.number_rts_receive, ssma_rdc.number_rts_overheard, ssma_rdc.number_rts_fail,
+			ssma_rdc.number_cts_sent, ssma_rdc.number_cts_receive, ssma_rdc.number_cts_overheard, ssma_rdc.number_cts_fail,
+			ssma_rdc.number_data_sent, ssma_rdc.number_data_fail, ssma_rdc.number_call_one, ssma_rdc.number_call_passive);
+
+	// Clear statistic before go into new supper frame
+	  ssma_rdc.rts_call = 0;
+	  ssma_rdc.number_rts_sent = 0;
+	  ssma_rdc.number_rts_receive = 0;
+	  ssma_rdc.number_rts_overheard = 0;
+	  ssma_rdc.number_rts_fail = 0;
+
+	  ssma_rdc.number_cts_sent = 0;
+	  ssma_rdc.number_cts_receive = 0;
+	  ssma_rdc.number_cts_overheard = 0;
+	  ssma_rdc.number_cts_fail = 0;
+
+	  ssma_rdc.number_data_sent = 0;
+	  ssma_rdc.number_data_fail = 0;
+
+	  ssma_rdc.number_call_one = 0;
+	  ssma_rdc.number_call_passive = 0;
+	/*
+	current_data->ptr = NULL;
+	SsmaRdcCancelTimer(SSMA_RDC_T_CANCEL);
+
+	PRINTF("Nullrdc: Init Cycle Period at start Supperframe period \n");
+	*/
+}
+void initCyclePeriodSink()
+{
+	ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+	ssma_rdc.rts_count = 0;
+	current_data->ptr = NULL;
+	ssma_rdc.isSendingPeriod = 0;
+	ssma_rdc.timer.flag = SSMA_RDC_T_CANCEL;
+	ssma_rdc.timer.isRunning = 0;
+
+	PRINTF("Nullrdc: Statistic: rts_s %u, rts_r %u, rts_o %u, rts_f %u, cts_s %u, cts_r %u, cts_o %u, cts_f %u, data_s %u, data_f %u \n",
+			ssma_rdc.number_rts_sent, ssma_rdc.number_rts_receive, ssma_rdc.number_rts_overheard, ssma_rdc.number_rts_fail,
+			ssma_rdc.number_cts_sent, ssma_rdc.number_cts_receive, ssma_rdc.number_cts_overheard, ssma_rdc.number_cts_fail,
+			ssma_rdc.number_data_sent, ssma_rdc.number_data_fail);
+
+	// Clear statistic before go into new supper frame
+	  ssma_rdc.number_rts_sent = 0;
+	  ssma_rdc.number_rts_receive = 0;
+	  ssma_rdc.number_rts_overheard = 0;
+	  ssma_rdc.number_rts_fail = 0;
+
+	  ssma_rdc.number_cts_sent = 0;
+	  ssma_rdc.number_cts_receive = 0;
+	  ssma_rdc.number_cts_overheard = 0;
+	  ssma_rdc.number_cts_fail = 0;
+
+	  ssma_rdc.number_data_sent = 0;
+	  ssma_rdc.number_data_fail = 0;
+
+	//PRINTF("Nullrdc: SINK NODE Init Cycle Period at start Supperframe period \n");
+}
+void CancelAllByAck()
+{
+	ssma_rdc.timer.flag = SSMA_RDC_T_CANCEL;
+	//rtimer_clock_t rt_now;
+	//rt_now = RTIMER_NOW();
+	//PRINTF("Nullrdc: Receive ACK and cancel all timer at %u \n",rt_now);
+}
+
+void RdcEndSendingSlot()
+{
+	//free_current_packet();
+	ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+	ssma_rdc.rts_count = 0;
+	//current_data->ptr = NULL;
+
+	ssma_rdc.isSendingPeriod = 0;
+
+	ssma_rdc.timer.flag = SSMA_RDC_T_CANCEL;
+	//SsmaRdcCancelTimer(SSMA_RDC_T_CANCEL);
+	//PRINTF("Nullrdc: At the end of sending period \n");
+}
+
+ void initPeriod()
+{
+	free_current_packet();
+	ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+	ssma_rdc.rts_count = 0;
+	ssma_rdc.rts_call = 0;
+	current_data->ptr = NULL;
+
+	ssma_rdc.isSendingPeriod = 1;
+	ssma_rdc.isSendData = 0;
+
+	  ssma_rdc.number_rts_sent = 0;
+	  ssma_rdc.number_rts_fail = 0;
+
+	  ssma_rdc.number_cts_receive = 0;
+
+	  ssma_rdc.number_data_sent = 0;
+	  ssma_rdc.number_data_fail = 0;
+
+	  ssma_rdc.number_call_one = 0;
+	ssma_rdc.number_call_passive = 0;
+
+	ssma_rdc.timer.flag = SSMA_RDC_T_CANCEL;
+
+	ssma_rdc.timer.isRunning = 0;
+
+	//PRINTF("Nullrdc: Init Period at start sending period \n");
+}
+/*---------------------------------------------------------------------------*/
+static int
+on(void)
+{
+  return NETSTACK_RADIO.on();
+}
+/*---------------------------------------------------------------------------*/
+static int
+off(int keep_radio_on)
+{
+  if(keep_radio_on) {
+    return NETSTACK_RADIO.on();
+  } else {
+    return NETSTACK_RADIO.off();
+  }
+}
+/*---------------------------------------------------------------------------*/
+static unsigned short
+channel_check_interval(void)
+{
+  return 0;
+}
+/*----------------------------------------------------------------------------*/
+void nullRdc_motes_send_command(void* message,uint8_t size)
+{
+	rtimer_clock_t t0;
+	t0 = RTIMER_NOW() + 100*(random_rand()%10);
+	while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+
+	switch(NETSTACK_RADIO.send(message, size))
+	{
+
+		case RADIO_TX_OK:
+		{
+			PRINTF("Mote send message OK \n");
+		  break;
+		}
+		case RADIO_TX_ERR:
+		{
+			PRINTF("Mote send message fail RADIO_TX_ERR \n");
+		  break;
+		}
+		case RADIO_TX_COLLISION:
+		{
+			rtimer_clock_t t0;
+			t0 = RTIMER_NOW() + 20*(random_rand()%10);
+			while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+			nullRdc_motes_send_command(message, size);
+		   break;
+		}
+		case RADIO_TX_NOACK:
+		{
+			PRINTF("Mote send message fail RADIO_TX_NOACK \n");
+		  break;
+		}
+		default:
+		{
+			PRINTF("Mote send message fail \n");
+		  break;
+		}
+	 }
+}
+/*---------------------------------------------------------------------------*/
+void nullRdc_relay_control(){
+	rtimer_clock_t t0;
+	if(isSendingCommandPeriod == 0 || isReceiveBroadcast == 0)
+	{
+		PRINTF( "Can not relay control message %u, %u \n", isSendingCommandPeriod, isReceiveBroadcast);
+		return;
+	}
+	// Wait to the working slot
+	//uint8_t i = random_rand()%SSMA_RDC_CW;
+	//t_end = RTIMER_NOW() + (rtimer_clock_t)SSMA_RDC_CW*SSMA_RDC_mBSS;
+
+	//if(i == 0)
+	{
+	    // wait a random delay that consider the propagation delay
+		t0 = RTIMER_NOW() + 50 + random_rand()%50;
+		while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+	}
+
+	/*
+	else
+	{
+		t0 = RTIMER_NOW() + (rtimer_clock_t)i*SSMA_RDC_mBSS;
+		while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+	    // wait a random delay that consider the propagation delay
+		t0 = RTIMER_NOW() + random_rand()%20;
+		while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+	}
+	*/
+/*
+	if(receiveControlMsg.frameType == 102)
+	{
+		time_attach = 1;
+	}
+	else
+	{
+		time_attach = 0;
+	}
+*/
+	switch(NETSTACK_RADIO.send(&receiveControlMsg, commandPktSize)){
+		case RADIO_TX_OK:
+		{
+			PRINTF("Relay Control OK \n");
+			NETSTACK_RADIO.off();
+			sendCount++;
+		  break;
+		}
+		case RADIO_TX_ERR:
+		{
+			//PRINTF("Send Control fail RADIO_TX_ERR \n");
+		  break;
+		}
+		case RADIO_TX_COLLISION:
+		{
+			//PRINTF("Relay fail at %d \n", i);
+			t0 = RTIMER_NOW() + random_rand()%10;
+			while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+			nullRdc_relay_control();
+		   break;
+		}
+		default:
+		{
+			PRINTF("Send Control fail \n");
+		  break;
+		}
+	 }
+}
+/*---------------------------------------------------------------------------*/
+void waitforbackoff(uint8_t num)
+{
+}
+/*---------------------------------------------------------------------------*/
+void nullRdc_send_control(uint8_t command[], uint8_t size)
+{
+	rtimer_clock_t t0;
+
+	//t0 = RTIMER_NOW() + 50 + random_rand()%100;
+	t0 = RTIMER_NOW() +20+ random_rand()%30;
+	while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+	switch(NETSTACK_RADIO.send(command, size))
+	{
+		case RADIO_TX_OK:
+		{
+			PRINTF("Send Control OK \n");
+		  break;
+		}
+		case RADIO_TX_ERR:
+		{
+			PRINTF("Send Control fail RADIO_TX_ERR \n");
+		  break;
+		}
+		case RADIO_TX_COLLISION:
+		{
+			//PRINTF("Send Control fail RADIO_TX_COLLISION \n");
+			t0 = RTIMER_NOW() + random_rand()%10;
+			while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+			nullRdc_send_control(command, size);
+		   break;
+		}
+		case RADIO_TX_NOACK:
+		{
+			PRINTF("Send Control fail RADIO_TX_NOACK \n");
+			break;
+		}
+		default:
+		{
+			PRINTF("Send Control fail \n");
+		  break;
+		}
+	 }
+}
+/*---------------------------------------------------------------------------*/
+#if PMS_SCD
+static void nullRdc_pms_send_data()
+{
+	struct pms_message dataStr;
+	dataStr.frameType = DATA_RESPONSE;
+	dataStr.hdNodeId = hd_NodeId;
+	dataStr.roomStatus = room_status;
+	dataStr.pmsNodeId = linkaddr_node_addr.u8[0];
+	dataStr.powerConsumption= GetPower();
+	PRINTF("nullRdc: Pms node sends data to anchor node\n");
+	nullRdc_motes_send_command(&dataStr,sizeof(struct pms_message));
+}
+#endif
+/*---------------------------------------------------------------------------*/
+#if ANCHOR_SCD
+void nullRdc_send_data_request_to_pms()
+{
+	struct srt_message messagePkt;
+	messagePkt.frameType = DATA_REQUEST;
+	messagePkt.nodeId = linkaddr_node_addr.u8[0];
+	PRINTF("nullRdc: Anchor node sends request to pms node\n");
+	nullRdc_motes_send_command(&messagePkt,sizeof(struct srt_message));
+}
+#endif
+
+
+uint8_t nullrdc_hd_try_nums = 0;
+#if HD_SCD
+void nullRdc_HD_send_room_status_to_PMS(void* message,uint8_t size)
+{
+
+
+	if(nullrdc_hd_try_nums >=3 )
+	{
+		nullrdc_hd_try_nums = 0;
+		device_module_off_CPU_Radio(NULL);
+		return;
+	}
+
+	nullrdc_hd_try_nums ++;
+
+
+	switch(NETSTACK_RADIO.send(message, size))
+	{
+
+		case RADIO_TX_OK:
+		{
+
+			PRINTF("Mote send message OK \n");
+
+			// waiting here to receive ACK
+			rtimer_clock_t wt = RTIMER_NOW();
+			while(RTIMER_CLOCK_LT(RTIMER_NOW(), wt + 40)) { }
+
+			uint8_t ackbuf[2] = {0,0};
+			uint8_t len = NETSTACK_RADIO.read(ackbuf, 2);
+			if(len == 2 && ackbuf[0] == HD_COMMAND_ACK)
+			{
+			 PRINTF("HD node %d receives ACK from PMS at: %d \n",linkaddr_node_addr.u8[0],RTIMER_NOW());
+			 //NETSTACK_RADIO.off();
+			 device_module_off_CPU_Radio(NULL);
+			}
+			else {
+				PRINTF("HD node does not receive ACK and retry: %d \n",nullrdc_hd_try_nums);
+
+				nullRdc_HD_send_room_status_to_PMS(message,size);
+				/*switch(NETSTACK_RADIO.send(message, size)){
+
+					case RADIO_TX_OK:
+					{
+						wt = RTIMER_NOW();
+
+						while(RTIMER_CLOCK_LT(RTIMER_NOW(), wt + 40)) { }
+
+
+						uint8_t ackbuf[2] = {0,0};
+						len = NETSTACK_RADIO.read(ackbuf, 2);
+						if(len == 2 && ackbuf[0] == HD_COMMAND_ACK)
+						{
+						 PRINTF("HD node %d receives ACK from PMS \n",linkaddr_node_addr.u8[0],RTIMER_NOW());
+						 //NETSTACK_RADIO.off();
+						 device_module_off_CPU_Radio(NULL);
+						}
+						else {
+							PRINTF("HD node does not receive ACK \n",RTIMER_NOW());
+
+						}
+						break;
+					}
+					case RADIO_TX_COLLISION:
+					{
+						break;
+					}
+					default:
+					{
+						PRINTF("Mote send message fail \n");
+					  break;
+					}
+				}*/
+			}
+
+			break;
+		}
+		case RADIO_TX_ERR:
+		{
+
+			PRINTF("Mote send message fail RADIO_TX_ERR \n");
+		  break;
+		}
+		case RADIO_TX_COLLISION:
+		{
+			rtimer_clock_t t0;
+			t0 = RTIMER_NOW() + (random_rand()%5);
+			while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+			nullRdc_HD_send_room_status_to_PMS(message, size);
+		   break;
+		}
+		case RADIO_TX_NOACK:
+		{
+
+		  PRINTF("Mote send message fail RADIO_TX_NOACK \n");
+		  break;
+		}
+		default:
+		{
+
+			PRINTF("Mote send message fail \n");
+		  break;
+		}
+	}
+
+
+}
+#endif
+#if PMS_SCD
+void nullRdc_PMS_send_command_to_RM(void* message,uint8_t size)
+{
+	if(nullrdc_pms_try_nums >=3)
+	{
+		return;
+	}
+	nullrdc_pms_try_nums++;
+
+	rtimer_clock_t t0 = RTIMER_NOW()+ 10 + (random_rand()%10);
+	while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+
+	switch(NETSTACK_RADIO.send(message, size))
+	{
+		case RADIO_TX_OK:
+		{
+			nullrdc_pms_count_sent++;
+			PRINTF("Mote send message OK at %u \n",get_global_time());
+		  break;
+		}
+		case RADIO_TX_ERR:
+		{
+			PRINTF("Mote send message fail RADIO_TX_ERR \n");
+		  break;
+		}
+		case RADIO_TX_COLLISION:
+		{
+			nullRdc_PMS_send_command_to_RM(message, size);
+			/*
+			rtimer_clock_t t0;
+			t0 = RTIMER_NOW() + (random_rand()%10);
+			while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0)) { }
+			NETSTACK_RADIO.send(message, size);
+			*/
+		   break;
+		}
+		case RADIO_TX_NOACK:
+		{
+			PRINTF("Mote send message fail RADIO_TX_NOACK \n");
+		  break;
+		}
+		default:
+		{
+			PRINTF("Mote send message fail \n");
+		  break;
+		}
+	 }
+}
+#endif
+/*--------------------------------------------------------------------------*/
+static void init(void)
+{
+  on();
+  memb_init(&packet_memb);
+  memb_init(&metadata_memb);
+
+  current_data = memb_alloc(&packet_memb);
+  current_data->ptr = memb_alloc( & metadata_memb);
+
+  ssma_rdc.state = SSMA_RDC_S_PASSIVE;
+  ssma_rdc.curbuf = NULL;
+  ssma_rdc.timer.flag = SSMA_RDC_TIMER_OFF | SSMA_RDC_T_UNDEFINED;
+  ssma_rdc.timer.seq = 0;
+  ssma_rdc.timer.isRunning = 0;
+  ssma_rdc.rts_count = 0;
+  ssma_rdc.rts_call = 0;
+  linkaddr_copy(&ssma_rdc.currentNextHopAddress, &linkaddr_null);
+
+  ssma_rdc.number_rts_sent = 0;
+  ssma_rdc.number_rts_receive = 0;
+  ssma_rdc.number_rts_overheard = 0;
+  ssma_rdc.number_rts_fail = 0;
+
+  ssma_rdc.number_cts_sent = 0;
+  ssma_rdc.number_cts_receive = 0;
+  ssma_rdc.number_cts_overheard = 0;
+  ssma_rdc.number_cts_fail = 0;
+
+  ssma_rdc.number_data_sent = 0;
+  ssma_rdc.number_data_fail = 0;
+
+  ssma_rdc.number_call_one = 0;
+  ssma_rdc.number_call_passive = 0;
+
+  num_superframe = 1000;
+  totalReceiveCount= 0;
+}
+/*---------------------------------------------------------------------------*/
+const struct rdc_driver nullrdc_driver = {
+  "nullrdc",
+  init,
+  send_packet,
+  send_list,
+  packet_input,
+  on,
+  off,
+  channel_check_interval,
+};
+/*---------------------------------------------------------------------------*/
