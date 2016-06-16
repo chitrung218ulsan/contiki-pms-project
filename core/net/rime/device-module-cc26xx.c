@@ -21,6 +21,8 @@
 
 #include "net/mac/nullrdc.h"
 
+#include "lib/ifft.h"
+
 #ifdef USE_CC2630_CONFIG
 #define USE_CC2630 USE_CC2630_CONFIG
 #else USE_CC2630 0
@@ -106,7 +108,7 @@ static uint8_t device_module_HD_check;
 static uint8_t device_module_curState;
 static uint8_t device_module_MW_is_checking;
 
-
+static uint8_t device_module_HD_retransmit_room_status;
 static const int16_t check_max_no_movement[20] =
 {
 	700, 400, 200, 125, 70, 40, 30, 30, 20, 15, 15, 10, 5, 5, 6, 3, 3, 3, 2, 2
@@ -200,12 +202,23 @@ PROCESS_THREAD(MW_check_process,ev,data)
 		if(FFT_HD_movement_detect >=1)
 		{
 			device_module_curState = E_STATE;
+
 			device_module_HD_check = 30;
+
+			device_module_turn_on_Radio();
+
+			device_module_HD_send_status_to_PMS_diretly(device_module_curState);
 
 		}
 		else
 		{
+			device_module_HD_check = 0;
+
 			device_module_curState = NE_STATE;
+
+			device_module_turn_on_Radio();
+
+			device_module_HD_send_status_to_PMS_diretly(device_module_curState);
 		}
 #endif
 	}
@@ -251,6 +264,9 @@ static void device_module_check_PIR()
 		{
 			//send to pms from NE_STATE to E_STATE
 			device_module_curState = E_STATE;
+
+			device_module_turn_on_Radio();
+
 			device_module_HD_send_status_to_PMS_diretly(device_module_curState);
 		}
 		else
@@ -369,16 +385,16 @@ static uint8_t device_module_process_data_PIR (int16_t *PIRDataset)
  */
 void device_module_set_period_general(void*ptr)
 {
+
 	cycleCount += 1;
 	if(cycleCount % 300 == 0)
 	{
-		//TurnOnCC2420();
+		device_module_turn_on_Radio();
 		ctimer_stop(&periodTimer);
 		ftsp_reset_seqNum();
 		return;
 	}
-	//TurnOnCC2420();
-	//device_module_HD_send_status_to_PMS_diretly(1);
+
 
 	if(device_module_MW_is_checking == 0)
 	{
@@ -391,6 +407,7 @@ void device_module_set_period_general(void*ptr)
 	}
 	else
 	{
+
 		ctimer_reset(&periodTimer);
 	}
 }
@@ -412,7 +429,12 @@ void device_module_HD_send_status_to_PMS_diretly(uint8_t roomStatus)
 	{
 		printf("Human-detection: HD node %d sends room status to PMS node\n",linkaddr_node_addr.u8[0]);
 	}
-	nullRdc_HD_send_room_status_to_PMS(&messagePkt,sizeof(struct hd_message_str));
+	uint8_t ret = nullRdc_HD_send_room_status_to_PMS(&messagePkt,sizeof(struct hd_message_str));
+	if(ret != RADIO_TX_OK)
+	{
+		// set flag to retransmit the room status
+	}
+	//call function to turn off radio chip
 }
 
 void device_module_off_CPU_Radio(void *ptr)
@@ -729,6 +751,9 @@ static void check_current_on_experation_func(void *ptr)
 
 		//TurnOnCC2420();
 		//rtimer_set(&radioOnTimer, RTIMER_NOW() + 1, 1, (rtimer_callback_t)device_module_set_timer_radio_on, NULL);
+
+		device_module_turn_on_Radio();
+
 		ctimer_reset(&periodTimer);
 		cycleCount = cycleCount + 1;
 		nullrdc_rm_cycle = cycleCount;
@@ -1055,7 +1080,7 @@ void device_module_open()
 	device_module_curState = E_STATE;
 	device_module_HD_check = 5;
 	device_module_MW_is_checking = 0;
-
+	device_module_HD_retransmit_room_status = 0;
 	//ctimer_set(&periodTimer, 1*CLOCK_SECOND,device_module_set_period_general,NULL);
 #endif
 

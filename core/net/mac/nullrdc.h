@@ -174,7 +174,7 @@ struct hd_message
 	uint8_t roomStatus;
 };
 extern uint8_t nullrdc_hd_try_nums;
-void nullRdc_HD_send_room_status_to_PMS(void* message,uint8_t size);
+uint8_t nullRdc_HD_send_room_status_to_PMS(void* message,uint8_t size);
 
 #endif
 

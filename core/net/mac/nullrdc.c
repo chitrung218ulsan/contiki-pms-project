@@ -502,15 +502,17 @@ init(void)
 /*----------------------------------------------------------------------------*/
 #if HD_SCD
 
-void nullRdc_HD_send_room_status_to_PMS(void* message,uint8_t size)
+uint8_t nullRdc_HD_send_room_status_to_PMS(void* message,uint8_t size)
 {
 
+	uint8_t ret;
 
 	if(nullrdc_hd_try_nums >=3 )
 	{
 		nullrdc_hd_try_nums = 0;
 		//device_module_off_CPU_Radio(NULL);
-		return;
+		ret = RADIO_TX_NOACK;
+		return ret;
 	}
 
 	nullrdc_hd_try_nums ++;
@@ -535,6 +537,7 @@ void nullRdc_HD_send_room_status_to_PMS(void* message,uint8_t size)
 				printf("HD node %d receives ACK from PMS at: %d \n",linkaddr_node_addr.u8[0],RTIMER_NOW());
 			 //NETSTACK_RADIO.off();
 			 //device_module_off_CPU_Radio(NULL);
+				ret = RADIO_TX_OK;
 			}
 			else {
 				printf("HD node does not receive ACK and retry: %d \n",nullrdc_hd_try_nums);
@@ -549,6 +552,7 @@ void nullRdc_HD_send_room_status_to_PMS(void* message,uint8_t size)
 		{
 
 			printf("Mote send message fail RADIO_TX_ERR \n");
+			ret = RADIO_TX_ERR;
 		  break;
 		}
 		case RADIO_TX_COLLISION:
@@ -563,16 +567,18 @@ void nullRdc_HD_send_room_status_to_PMS(void* message,uint8_t size)
 		{
 
 			printf("Mote send message fail RADIO_TX_NOACK \n");
+			ret = RADIO_TX_NOACK;
 		  break;
 		}
 		default:
 		{
 
 			printf("Mote send message fail \n");
+			ret = RADIO_TX_NOACK;
 		  break;
 		}
 	}
-
+	return ret;
 
 }
 #endif /*HD_SCD*/
