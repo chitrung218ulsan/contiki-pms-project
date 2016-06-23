@@ -1,6 +1,6 @@
 CONTIKI = ../..
 
-CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"
+//CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"
 
 
 all: example-abc example-mesh example-collect example-trickle example-polite \

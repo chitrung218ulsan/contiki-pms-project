@@ -353,9 +353,7 @@ void ftsp_set_mode(uint8_t mode_)
 	mode = mode_;
 }
 
-/*********************************************************************************
- * Maintain time synchronization when receive a command message with time info
- ********************************************************************************/
+
 void ftsp_maintain_syn(unsigned int	node_id, unsigned long global_time)
 {
 	if ((state & STATE_PROCESSING) == 0)
@@ -478,16 +476,16 @@ PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et_process_msg));
 // disable interrupts while we process the received message:
 // avoid errors due to interrupts during the processing
 
-#if USE_CC2420
+#if RADIO_CC2420
 dint();
-#else if USE_CC2630
+#else if RADIO_CC2630
 ti_lib_int_master_disable();
 #endif
 
 process_msg();
-#if USE_CC2420
+#if RADIO_CC2420
 eint();
-#else if USE_CC2630
+#else if RADIO_CC2630
 ti_lib_int_master_enable();
 #endif
 

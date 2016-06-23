@@ -43,6 +43,19 @@
 #include "net/netstack.h"
 #include <string.h>
 
+#include "deluge.h"
+
+
+
+#define DEBUG	1
+#if DEBUG
+#include <stdio.h>
+#define PRINTF(...)	printf(__VA_ARGS__)
+#else
+#define PRINTF(...)
+#endif
+
+uint8_t nullrdc_noframer_sent_count;
 /*---------------------------------------------------------------------------*/
 static void
 send_packet(mac_callback_t sent, void *ptr)
@@ -68,7 +81,72 @@ send_list(mac_callback_t sent, void *ptr, struct rdc_buf_list *buf_list)
 static void
 packet_input(void)
 {
-  printf("NULLRDC_NOFRAMMER, packet input \n");
+  PRINTF("NULLRDC_NOFRAMMER, packet input \n");
+
+  char *msg;
+  int len;
+  struct deluge_msg_profile *profile;
+  struct deluge_msg_packet *packet;
+  struct deluge_msg_request *request;
+
+  msg = packetbuf_dataptr();
+  len = packetbuf_datalen();
+  if(len < 1)
+    return;
+
+
+  switch(msg[0])
+  {
+	  case DELUGE_CMD_SUMMARY:
+	  {
+		  PRINTF("In packet_input: DELUGE_CMD_SUMMARY \n");
+		  break;
+	  }
+	  case DELUGE_CMD_REQUEST:
+	  {
+		  PRINTF("In packet_input: DELUGE_CMD_REQUEST \n");
+		  if(len >= sizeof(struct deluge_msg_request))
+		  {
+			  request = (struct deluge_msg_request *)msg;
+			  if(linkaddr_cmp(&request->receiver,&linkaddr_node_addr))
+			  {
+				   handle_request_mc_deluge((struct deluge_msg_request *)msg);
+			  }
+			  //handle_request((struct deluge_msg_request *)msg);
+
+		  }
+
+		  break;
+	  }
+	  case DELUGE_CMD_PACKET:
+	  {
+		  PRINTF("In packet_input: DELUGE_CMD_PACKET \n");
+		  packet = (struct deluge_msg_packet *)msg;
+		  if(len >= sizeof(struct deluge_msg_packet))
+		  {
+			    linkaddr_copy(&current_object.parent_addr, &packet->sender);
+		      	handle_packet_mc_deluge((struct deluge_msg_packet *)msg, &packet->sender);
+		  }
+
+		  break;
+	  }
+	  case DELUGE_CMD_PROFILE:
+	  {
+		  PRINTF("In packet_input: DELUGE_CMD_PROFILE \n");
+		  profile = (struct deluge_msg_profile *)msg;
+		  if(len >= sizeof(*profile) &&
+			 len >= sizeof(*profile) + profile->npages * profile->version_vector[0])
+
+			//handle_profile((struct deluge_msg_profile *)msg);
+			handle_profile_mc_deluge((struct deluge_msg_profile *)msg);
+		  break;
+	  }
+	  default:
+		  break;
+  }
+
+
+
   NETSTACK_MAC.input();
 }
 /*---------------------------------------------------------------------------*/
@@ -98,6 +176,100 @@ static void
 init(void)
 {
   on();
+}
+
+
+
+
+/*---------------------------------------------------------------------------*/
+
+uint8_t nullrdc_noframer_send_packet(void* message,uint8_t size, uint8_t retry)
+{
+	if(nullrdc_noframer_sent_count >= 3)
+	{
+		nullrdc_noframer_sent_count = 0;
+		return RADIO_TX_COLLISION;
+	}
+	uint8_t ret = RADIO_TX_ERR;
+
+	nullrdc_noframer_sent_count++;
+
+	switch(NETSTACK_RADIO.send(message, size))
+	{
+			case RADIO_TX_OK:
+			{
+				PRINTF("Mote send message OK \n");
+				ret = RADIO_TX_OK;
+				break;
+			}
+			case RADIO_TX_ERR:
+			{
+				PRINTF("Mote send message fail RADIO_TX_ERR \n");
+				ret = RADIO_TX_ERR;
+				break;
+			}
+			case RADIO_TX_COLLISION:
+			{
+				PRINTF("Mote send message fail RADIO_TX_COLLISION \n");
+
+				 /*rtimer_clock_t t0;
+				 t0 = RTIMER_NOW() + 2+ (random_rand()%10);
+				while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0 )) { }*/
+				if(retry == 1)
+				{
+					nullrdc_noframer_send_packet(message,size, 0);
+				}
+
+				ret = RADIO_TX_COLLISION;
+				break;
+			}
+			case RADIO_TX_NOACK:
+			{
+				PRINTF("Mote send message fail RADIO_TX_NOACK \n");
+				ret = RADIO_TX_NOACK;
+				break;
+			}
+			default:
+			{
+				PRINTF("Mote send message fail \n");
+				ret = RADIO_TX_ERR;
+			  break;
+			}
+	}
+	return ret;
+}
+/*---------------------------------------------------------------------------*/
+uint8_t nullrdc_noframer_check_channel()
+{
+	int i;
+	NETSTACK_RADIO.off();
+	if(NETSTACK_RADIO.receiving_packet() || NETSTACK_RADIO.pending_packet())
+	{
+		NETSTACK_RADIO.on();
+		return 0;
+	}
+	for(i = 0; i < 6; ++i)
+	{
+
+	  NETSTACK_RADIO.on();
+	  rtimer_clock_t t0 = RTIMER_NOW();
+
+
+	  while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0 + 5))
+	  {
+			 if(NETSTACK_RADIO.channel_clear() == 0)
+			 {
+				  NETSTACK_RADIO.on();
+				  return 0;
+			 }
+	  }
+
+	  NETSTACK_RADIO.off();
+	  t0 = RTIMER_NOW();
+	  while(RTIMER_CLOCK_LT(RTIMER_NOW(), t0 + 16)) { }
+	}
+	NETSTACK_RADIO.on();
+	return 1;
 }
 /*---------------------------------------------------------------------------*/
 const struct rdc_driver nullrdc_noframer_driver = {

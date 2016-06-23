@@ -54,7 +54,8 @@ obj_srf06-cc26xx/device-module-cc26xx.o: \
  ../../core/./net/mac/framer.h ../../core/net/rime/device-module-cc26xx.h \
  ../../core/./net/mac/nullrdc.h \
  ../../core/./net/mac/contikimac/contikimac.h \
- ../../core/./net/rime/ftsp.h ../../cpu/cc26xx-cc13xx/dev/cc26xx_adc.h \
+ ../../core/./net/rime/ftsp.h ../../core/./lib/ifft.h \
+ ../../cpu/cc26xx-cc13xx/dev/cc26xx_adc.h \
  ../../cpu/cc26xx-cc13xx/./rf-core/rf-ble.h \
  ../../cpu/cc26xx-cc13xx/./rf-core/rf-core.h \
  ../../cpu/cc26xx-cc13xx/./rf-core/api/common_cmd.h \
@@ -164,7 +165,8 @@ obj_srf06-cc26xx/device-module-cc26xx.o: \
  ../../core/./net/mac/framer.h ../../core/net/rime/device-module-cc26xx.h :
  ../../core/./net/mac/nullrdc.h :
  ../../core/./net/mac/contikimac/contikimac.h :
- ../../core/./net/rime/ftsp.h ../../cpu/cc26xx-cc13xx/dev/cc26xx_adc.h :
+ ../../core/./net/rime/ftsp.h ../../core/./lib/ifft.h :
+ ../../cpu/cc26xx-cc13xx/dev/cc26xx_adc.h :
  ../../cpu/cc26xx-cc13xx/./rf-core/rf-ble.h :
  ../../cpu/cc26xx-cc13xx/./rf-core/rf-core.h :
  ../../cpu/cc26xx-cc13xx/./rf-core/api/common_cmd.h :

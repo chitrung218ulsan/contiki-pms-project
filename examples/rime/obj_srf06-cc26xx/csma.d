@@ -1,6 +1,6 @@
 obj_srf06-cc26xx/csma.o: ../../core/net/mac/csma.c \
  ../../core/./net/mac/csma.h ../../core/./net/mac/mac.h \
- ../../platform/srf06-cc26xx/./contiki-conf.h \
+ ../../platform/srf06-cc26xx/./contiki-conf.h project-conf.h \
  ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h \
@@ -38,7 +38,7 @@ obj_srf06-cc26xx/csma.o: ../../core/net/mac/csma.c \
  ../../core/./lib/list.h ../../core/./lib/memb.h
 ../../core/net/mac/csma.c :
  ../../core/./net/mac/csma.h ../../core/./net/mac/mac.h :
- ../../platform/srf06-cc26xx/./contiki-conf.h :
+ ../../platform/srf06-cc26xx/./contiki-conf.h project-conf.h :
  ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h :

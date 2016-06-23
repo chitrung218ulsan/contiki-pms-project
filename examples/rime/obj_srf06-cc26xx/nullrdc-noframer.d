@@ -1,7 +1,7 @@
 obj_srf06-cc26xx/nullrdc-noframer.o: \
  ../../core/net/mac/nullrdc-noframer.c \
  ../../core/./net/mac/nullrdc-noframer.h ../../core/./net/mac/rdc.h \
- ../../platform/srf06-cc26xx/./contiki-conf.h \
+ ../../platform/srf06-cc26xx/./contiki-conf.h project-conf.h \
  ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h \
@@ -37,7 +37,7 @@ obj_srf06-cc26xx/nullrdc-noframer.o: \
  ../../core/./net/llsec/llsec.h ../../core/./net/mac/framer.h
  ../../core/net/mac/nullrdc-noframer.c :
  ../../core/./net/mac/nullrdc-noframer.h ../../core/./net/mac/rdc.h :
- ../../platform/srf06-cc26xx/./contiki-conf.h :
+ ../../platform/srf06-cc26xx/./contiki-conf.h project-conf.h :
  ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h :

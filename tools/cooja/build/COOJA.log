@@ -1,50 +1,230 @@
-[09:34:50 - AWT-EventQueue-0] [Cooja.java:2856] [INFO] - External tools default settings: /external_tools_linux.config
-[09:34:50 - AWT-EventQueue-0] [Cooja.java:2886] [INFO] - External tools user settings: /home/user/.cooja.user.properties
-[09:35:13 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
-[09:35:13 - AWT-EventQueue-0] [Visualizer.java:256] [INFO] - Registered external visualizer: org.contikios.cooja.plugins.skins.DGRMVisualizerSkin
-[09:35:31 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make example-broadcast.sky TARGET=sky 
-[09:35:48 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make clean TARGET=sky 
-[09:35:49 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make example-broadcast.sky TARGET=sky 
-[09:35:58 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/example-broadcast.sky
-[09:35:59 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/example-broadcast.sky
-[09:36:18 - Thread-1] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465691778896
-[09:36:23 - Thread-1] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465691783428	Duration: 4532 ms	Simulated time 155652 ms	Ratio 34.34510150044131
-[09:50:34 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
-[09:50:44 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[09:50:46 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[09:51:28 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[09:51:31 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[09:51:34 - Thread-4] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465692694507
-[09:51:44 - Thread-4] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465692704823	Duration: 10316 ms	Simulated time 155463 ms	Ratio 15.070085304381543
-[09:57:32 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
-[09:57:40 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[09:57:43 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[09:58:00 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[09:58:02 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[09:58:06 - Thread-7] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465693086790
-[09:58:09 - Thread-7] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465693089107	Duration: 2317 ms	Simulated time 38312 ms	Ratio 16.535174794993527
-[09:58:21 - Thread-8] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465693101472
-[09:58:28 - Thread-8] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465693108203	Duration: 6731 ms	Simulated time 136944 ms	Ratio 20.345268162234436
-[10:33:57 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
-[10:34:05 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[10:34:07 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[10:34:26 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[10:34:29 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[10:34:32 - Thread-11] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465695272862
-[10:34:44 - Thread-11] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465695284008	Duration: 11146 ms	Simulated time 157499 ms	Ratio 14.13054010407321
-[10:34:51 - Thread-12] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465695291821
-[10:34:59 - Thread-12] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465695299863	Duration: 8042 ms	Simulated time 243680 ms	Ratio 30.30092016911216
-[10:36:44 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
-[10:37:12 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[10:37:14 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[10:37:30 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[10:37:32 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[10:37:37 - Thread-15] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465695457293
-[10:37:52 - Thread-15] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465695472639	Duration: 15346 ms	Simulated time 201680 ms	Ratio 13.14218688909162
-[10:43:15 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: 123456
-[10:43:32 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[10:43:34 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[10:43:48 - AWT-EventQueue-0] [CompileContiki.java:140] [INFO] - > make module-cc2630-example.sky TARGET=sky 
-[10:43:50 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-3.0-new/examples/rime/module-cc2630-example.sky
-[10:43:54 - Thread-18] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1465695834402
-[10:44:05 - Thread-18] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1465695845263	Duration: 10861 ms	Simulated time 148667 ms	Ratio 13.688150262406776
+[20:34:21 - AWT-EventQueue-0] [Cooja.java:2856] [INFO] - External tools default settings: /external_tools_linux.config
+[20:34:21 - AWT-EventQueue-0] [Cooja.java:2886] [INFO] - External tools user settings: /home/user/.cooja.user.properties
+[20:34:37 - AWT-EventQueue-0] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[20:34:37 - AWT-EventQueue-0] [Visualizer.java:256] [INFO] - Registered external visualizer: org.contikios.cooja.plugins.skins.DGRMVisualizerSkin
+[20:34:51 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:34:51 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:34:55 - Thread-1] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466595295942
+[20:34:59 - Thread-1] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466595299260	Duration: 3318 ms	Simulated time 58280 ms	Ratio 17.564798071127186
+[20:38:39 - Thread-2] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[20:38:39 - Thread-2] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:38:39 - Thread-2] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:38:40 - Thread-2] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[20:38:41 - Thread-3] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466595521330
+[20:38:44 - Thread-3] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466595524245	Duration: 2915 ms	Simulated time 56491 ms	Ratio 19.379416809605488
+[20:40:30 - Thread-4] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[20:40:30 - Thread-4] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:40:30 - Thread-4] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:40:30 - Thread-4] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[20:40:31 - Thread-5] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466595631336
+[20:40:33 - Thread-5] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466595633590	Duration: 2254 ms	Simulated time 38819 ms	Ratio 17.222271517302573
+[20:48:24 - Thread-6] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[20:48:24 - Thread-6] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:48:24 - Thread-6] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:48:24 - Thread-6] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[20:48:25 - Thread-7] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466596105748
+[20:48:28 - Thread-7] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466596108000	Duration: 2252 ms	Simulated time 26507 ms	Ratio 11.770426287744227
+[20:51:54 - Thread-8] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[20:51:54 - Thread-8] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:51:54 - Thread-8] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:51:54 - Thread-8] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[20:51:57 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:52:11 - Thread-9] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466596331325
+[20:52:14 - Thread-9] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466596334044	Duration: 2719 ms	Simulated time 22648 ms	Ratio 8.329532916513424
+[20:52:16 - Thread-10] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466596336604
+[20:52:17 - Thread-10] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466596337450	Duration: 846 ms	Simulated time 37007 ms	Ratio 43.7434988179669
+[20:55:05 - Thread-11] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[20:55:05 - Thread-11] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:55:05 - Thread-11] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:55:05 - Thread-11] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[20:55:06 - Thread-12] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466596506508
+[20:55:09 - Thread-12] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466596509379	Duration: 2871 ms	Simulated time 44881 ms	Ratio 15.632532218739115
+[20:55:54 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:55:59 - Thread-13] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[20:55:59 - Thread-13] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:56:00 - Thread-13] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:56:00 - Thread-13] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:56:00 - Thread-13] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[20:56:01 - Thread-14] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466596561364
+[20:56:05 - Thread-14] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466596565298	Duration: 3934 ms	Simulated time 42600 ms	Ratio 10.828673106253177
+[20:57:31 - Thread-15] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[20:57:31 - Thread-15] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:57:31 - Thread-15] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:57:31 - Thread-15] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[20:57:31 - Thread-15] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[20:57:32 - Thread-16] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466596652221
+[20:57:36 - Thread-16] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466596656180	Duration: 3959 ms	Simulated time 44756 ms	Ratio 11.30487496842637
+[21:00:18 - Thread-17] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:00:18 - Thread-17] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:00:19 - Thread-17] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:00:19 - Thread-17] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:00:19 - Thread-17] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:00:20 - Thread-18] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466596820048
+[21:00:23 - Thread-18] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466596823189	Duration: 3141 ms	Simulated time 20344 ms	Ratio 6.47691817892391
+[21:07:14 - Thread-19] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:07:14 - Thread-19] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:07:14 - Thread-19] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:07:14 - Thread-19] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:07:14 - Thread-19] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:07:15 - Thread-20] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466597235184
+[21:07:18 - Thread-20] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466597238015	Duration: 2831 ms	Simulated time 16632 ms	Ratio 5.874955845990816
+[21:08:02 - Thread-21] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:08:02 - Thread-21] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:08:02 - Thread-21] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:08:02 - Thread-21] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:08:02 - Thread-21] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:08:03 - Thread-22] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466597283624
+[21:08:06 - Thread-22] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466597286315	Duration: 2691 ms	Simulated time 16452 ms	Ratio 6.11371237458194
+[21:12:08 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:12:31 - Thread-23] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:12:31 - Thread-23] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:12:31 - Thread-23] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:12:31 - Thread-23] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:12:31 - Thread-23] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:12:31 - Thread-23] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:12:32 - Thread-24] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466597552037
+[21:12:36 - Thread-24] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466597556865	Duration: 4828 ms	Simulated time 33366 ms	Ratio 6.9109362054681025
+[21:13:13 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:13 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:13 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:13 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:13 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:40 - Thread-25] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:13:40 - Thread-25] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:41 - Thread-25] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:41 - Thread-25] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:41 - Thread-25] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:13:41 - Thread-25] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:13:42 - Thread-26] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466597622181
+[21:13:50 - Thread-26] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466597630954	Duration: 8773 ms	Simulated time 85538 ms	Ratio 9.75014248261712
+[21:14:47 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:15:09 - Thread-27] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:15:09 - Thread-27] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:15:09 - Thread-27] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:15:09 - Thread-27] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:15:09 - Thread-27] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:15:10 - Thread-27] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:15:10 - Thread-28] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466597710556
+[21:15:20 - Thread-28] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466597720799	Duration: 10243 ms	Simulated time 101374 ms	Ratio 9.896905203553647
+[21:17:06 - Thread-29] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:17:06 - Thread-29] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:17:06 - Thread-29] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:17:06 - Thread-29] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:17:07 - Thread-29] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:17:07 - Thread-30] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466597827766
+[21:17:11 - Thread-30] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466597831770	Duration: 4004 ms	Simulated time 36023 ms	Ratio 8.996753246753247
+[21:33:30 - Thread-31] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:33:30 - Thread-31] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:33:31 - Thread-31] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:33:31 - Thread-31] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:33:31 - Thread-31] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:33:36 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:14 - Thread-32] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:34:14 - Thread-32] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:14 - Thread-32] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:15 - Thread-32] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:15 - Thread-32] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:15 - Thread-32] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:34:20 - Thread-33] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:34:20 - Thread-33] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:20 - Thread-33] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:21 - Thread-33] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:21 - Thread-33] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:34:21 - Thread-33] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:34:21 - Thread-34] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466598861906
+[21:34:26 - Thread-34] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466598866746	Duration: 4840 ms	Simulated time 25132 ms	Ratio 5.192561983471075
+[21:34:28 - Thread-35] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466598868121
+[21:34:31 - Thread-35] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466598871680	Duration: 3559 ms	Simulated time 49538 ms	Ratio 13.919078392806968
+[21:41:43 - Thread-36] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:41:43 - Thread-36] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:41:44 - Thread-36] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:41:44 - Thread-36] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:41:44 - Thread-36] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:41:44 - Thread-36] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:41:45 - Thread-37] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466599305069
+[21:41:49 - Thread-37] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466599309181	Duration: 4112 ms	Simulated time 17424 ms	Ratio 4.237354085603113
+[21:42:01 - Thread-38] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:42:01 - Thread-38] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:42:01 - Thread-38] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:42:01 - Thread-38] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:42:01 - Thread-38] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:42:01 - Thread-38] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:42:02 - Thread-39] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466599322606
+[21:42:08 - Thread-39] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466599328343	Duration: 5737 ms	Simulated time 34460 ms	Ratio 6.00662367090814
+[21:48:28 - Thread-40] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[21:48:28 - Thread-40] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:48:28 - Thread-40] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:48:28 - Thread-40] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:48:28 - Thread-40] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[21:48:29 - Thread-40] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[21:48:30 - Thread-41] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466599710295
+[21:48:34 - Thread-41] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466599714293	Duration: 3998 ms	Simulated time 17389 ms	Ratio 4.3494247123561784
+[22:03:10 - Thread-42] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466600590068
+[22:03:16 - Thread-42] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466600596506	Duration: 6438 ms	Simulated time 99225 ms	Ratio 15.412395153774463
+[22:11:18 - Thread-43] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601078858
+[22:11:21 - Thread-43] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601081101	Duration: 2243 ms	Simulated time 128038 ms	Ratio 57.08337048595631
+[22:13:39 - Thread-44] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601219346
+[22:13:41 - Thread-44] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601221012	Duration: 1666 ms	Simulated time 149147 ms	Ratio 89.52400960384153
+[22:14:28 - Thread-45] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[22:14:28 - Thread-45] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:14:29 - Thread-45] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:14:29 - Thread-45] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:14:29 - Thread-45] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:14:29 - Thread-45] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[22:14:30 - Thread-46] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601270487
+[22:14:36 - Thread-46] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601276429	Duration: 5942 ms	Simulated time 48007 ms	Ratio 8.079266240323124
+[22:18:29 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:18:54 - Thread-47] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[22:18:54 - Thread-47] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:18:54 - Thread-47] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:18:54 - Thread-47] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:18:54 - Thread-47] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:18:54 - Thread-47] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:18:54 - Thread-47] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[22:18:55 - Thread-48] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601535881
+[22:19:11 - Thread-48] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601551640	Duration: 15759 ms	Simulated time 132452 ms	Ratio 8.404848023351736
+[22:21:44 - Thread-49] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[22:21:44 - Thread-49] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:21:44 - Thread-49] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:21:44 - Thread-49] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:21:44 - Thread-49] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:21:44 - Thread-49] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:21:44 - Thread-49] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[22:21:45 - Thread-50] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601705626
+[22:21:51 - Thread-50] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601711855	Duration: 6229 ms	Simulated time 29756 ms	Ratio 4.7770107561406325
+[22:22:04 - Thread-51] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601724635
+[22:22:06 - Thread-51] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601726241	Duration: 1606 ms	Simulated time 47819 ms	Ratio 29.77521793275218
+[22:22:08 - Thread-52] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[22:22:08 - Thread-52] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:22:08 - Thread-52] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:22:08 - Thread-52] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:22:08 - Thread-52] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:22:09 - Thread-52] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[22:22:09 - Thread-53] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601729754
+[22:22:19 - Thread-53] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601739248	Duration: 9494 ms	Simulated time 85756 ms	Ratio 9.032652201390352
+[22:23:48 - Thread-54] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[22:23:48 - Thread-54] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:23:48 - Thread-54] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:23:48 - Thread-54] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:23:48 - Thread-54] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:23:48 - Thread-54] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[22:23:49 - Thread-55] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601829410
+[22:23:55 - Thread-55] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601835938	Duration: 6528 ms	Simulated time 53694 ms	Ratio 8.225183823529411
+[22:25:18 - Thread-56] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[22:25:18 - Thread-56] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:25:18 - Thread-56] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:25:18 - Thread-56] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:25:18 - Thread-56] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[22:25:18 - Thread-56] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[22:25:19 - Thread-57] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466601919443
+[22:25:26 - Thread-57] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466601926369	Duration: 6926 ms	Simulated time 49936 ms	Ratio 7.209933583598036
+[00:06:51 - AWT-EventQueue-0] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[00:10:43 - Thread-58] [Simulation.java:421] [INFO] - Simulation random seed: -1310321290086094964
+[00:10:43 - Thread-58] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[00:10:43 - Thread-58] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[00:10:43 - Thread-58] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[00:10:43 - Thread-58] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[00:10:43 - Thread-58] [MspMote.java:235] [INFO] - Loading firmware from: /home/user/contiki-pms-project/examples/sky/test-deluge.sky
+[00:10:43 - Thread-58] [TimeLine.java:567] [INFO] - Zoom level: 500.0 microseconds/pixel 
+[00:10:53 - Thread-59] [Simulation.java:252] [INFO] - Simulation main loop started, system time: 1466608253289
+[00:11:01 - Thread-59] [Simulation.java:311] [INFO] - Simulation main loop stopped, system time: 1466608261829	Duration: 8540 ms	Simulated time 44352 ms	Ratio 5.19344262295082

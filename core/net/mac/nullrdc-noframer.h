@@ -44,5 +44,8 @@
 #include "dev/radio.h"
 
 extern const struct rdc_driver nullrdc_noframer_driver;
+extern uint8_t nullrdc_noframer_sent_count;
+
+uint8_t nullrdc_noframer_send_packet(void* message,uint8_t size, uint8_t retry);
 
 #endif /* NULLRDC_NOFRAMER_H_ */

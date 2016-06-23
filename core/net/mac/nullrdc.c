@@ -285,7 +285,7 @@ packet_input(void)
 
 	uint8_t first_byte = *((uint8_t *)packetbuf_dataptr()); // Get first byte value of packet
 	int original_datalen = packetbuf_datalen();
-	printf("Nullrdc: First byte receives %u \n", first_byte);
+	//printf("Nullrdc: First byte receives %u \n", first_byte);
 
 #if NULLRDC_SEND_802154_ACK
   int original_datalen;

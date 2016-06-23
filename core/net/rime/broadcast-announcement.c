@@ -226,8 +226,7 @@ broadcast_announcement_stop(void)
   broadcast_close(&c.c);
 }
 /*---------------------------------------------------------------------------*/
-clock_time_t
-broadcast_announcement_beacon_interval(void)
+clock_time_t broadcast_announcement_beacon_interval(void)
 {
   return c.current_interval;
 }

@@ -15,7 +15,7 @@ obj_srf06-cc26xx/gpio-interrupt.o: \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_gpio.h \
  ../../cpu/cc26xx-cc13xx/dev/gpio-interrupt.h ../../core/./sys/energest.h \
  ../../core/./sys/rtimer.h ../../platform/srf06-cc26xx/./contiki-conf.h \
- ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
+ project-conf.h ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
  ../../cpu/cc26xx-cc13xx/./rtimer-arch.h ../../core/./contiki.h \
  ../../core/./contiki-version.h ../../core/./contiki-default-conf.h \
  ../../core/./sys/process.h ../../core/./sys/pt.h ../../core/./sys/lc.h \
@@ -95,7 +95,7 @@ obj_srf06-cc26xx/gpio-interrupt.o: \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_gpio.h :
  ../../cpu/cc26xx-cc13xx/dev/gpio-interrupt.h ../../core/./sys/energest.h :
  ../../core/./sys/rtimer.h ../../platform/srf06-cc26xx/./contiki-conf.h :
- ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
+ project-conf.h ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
  ../../cpu/cc26xx-cc13xx/./rtimer-arch.h ../../core/./contiki.h :
  ../../core/./contiki-version.h ../../core/./contiki-default-conf.h :
  ../../core/./sys/process.h ../../core/./sys/pt.h ../../core/./sys/lc.h :

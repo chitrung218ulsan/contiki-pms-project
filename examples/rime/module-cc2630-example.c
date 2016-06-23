@@ -10,8 +10,9 @@
 #include "net/mac/nullrdc.h"
 #include "net/rime/device-module-cc26xx.h"
 #include "net/rime/ftsp.h"
-#include <stdio.h>
-#include <string.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 //PROCESS(test_human_detection_process, "Test human detection algorithm");
 PROCESS(device_process, "device process");
 

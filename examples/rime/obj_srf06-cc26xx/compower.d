@@ -1,5 +1,5 @@
 obj_srf06-cc26xx/compower.o: ../../core/sys/compower.c \
- ../../platform/srf06-cc26xx/./contiki-conf.h \
+ ../../platform/srf06-cc26xx/./contiki-conf.h project-conf.h \
  ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h \
@@ -32,7 +32,7 @@ obj_srf06-cc26xx/compower.o: ../../core/sys/compower.c \
  ../../core/./net/ip/uip.h ../../core/./net/ip/uipopt.h \
  ../../core/./net/ip/tcpip.h ../../core/./net/mac/tsch/tsch-conf.h
 ../../core/sys/compower.c :
- ../../platform/srf06-cc26xx/./contiki-conf.h :
+ ../../platform/srf06-cc26xx/./contiki-conf.h project-conf.h :
  ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h :

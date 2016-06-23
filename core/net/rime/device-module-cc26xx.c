@@ -9,6 +9,7 @@
 #include "net/netstack.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include "sys/rtimer.h"
 
@@ -22,6 +23,12 @@
 #include "net/mac/nullrdc.h"
 
 #include "lib/ifft.h"
+
+/*
+ * For chip CC2630, we can include file project-conf and define USE_CC2630_CONFIG or USE_CC2420_CONFIG
+ * For chip CC2420, we have to define directly in file contiki-conf.h in the folder flatform
+ */
+
 
 #ifdef USE_CC2630_CONFIG
 #define USE_CC2630 USE_CC2630_CONFIG
@@ -1107,8 +1114,11 @@ void device_module_save_power()
 
 void device_module_get_battery_voltage(uint32_t *battery_voltage)
 {
+	*(battery_voltage) = 0;
+#if USE_CC2630
 	 ti_lib_aon_batmon_enable();
 	 *battery_voltage =ti_lib_aon_batmon_battery_voltage_get();
 	 ti_lib_aon_batmon_disable();
+#endif
 
 }

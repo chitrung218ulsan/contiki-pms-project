@@ -1,7 +1,7 @@
 obj_srf06-cc26xx/framer-802154.o: ../../core/net/mac/framer-802154.c \
  ../../core/./net/mac/framer-802154.h ../../core/./net/mac/framer.h \
  ../../core/./net/mac/frame802154.h \
- ../../platform/srf06-cc26xx/./contiki-conf.h \
+ ../../platform/srf06-cc26xx/./contiki-conf.h project-conf.h \
  ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h \
@@ -35,7 +35,7 @@ obj_srf06-cc26xx/framer-802154.o: ../../core/net/mac/framer-802154.c \
 ../../core/net/mac/framer-802154.c :
  ../../core/./net/mac/framer-802154.h ../../core/./net/mac/framer.h :
  ../../core/./net/mac/frame802154.h :
- ../../platform/srf06-cc26xx/./contiki-conf.h :
+ ../../platform/srf06-cc26xx/./contiki-conf.h project-conf.h :
  ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h :

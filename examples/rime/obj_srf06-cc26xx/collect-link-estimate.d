@@ -2,7 +2,7 @@ obj_srf06-cc26xx/collect-link-estimate.o: \
  ../../core/net/rime/collect-link-estimate.c \
  ../../core/./net/rime/collect.h ../../core/./net/rime/announcement.h \
  ../../core/./net/linkaddr.h ../../platform/srf06-cc26xx/./contiki-conf.h \
- ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
+ project-conf.h ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_chip_def.h \
@@ -43,7 +43,7 @@ obj_srf06-cc26xx/collect-link-estimate.o: \
  ../../core/net/rime/collect-link-estimate.c :
  ../../core/./net/rime/collect.h ../../core/./net/rime/announcement.h :
  ../../core/./net/linkaddr.h ../../platform/srf06-cc26xx/./contiki-conf.h :
- ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
+ project-conf.h ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_chip_def.h :

@@ -1,6 +1,6 @@
 obj_srf06-cc26xx/netstack.o: ../../core/net/netstack.c \
  ../../core/./net/netstack.h ../../platform/srf06-cc26xx/./contiki-conf.h \
- ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
+ project-conf.h ../../platform/srf06-cc26xx/srf06/cc26xx/board.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h \
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_chip_def.h \
@@ -34,7 +34,7 @@ obj_srf06-cc26xx/netstack.o: ../../core/net/netstack.c \
  ../../core/./net/mac/framer.h
 ../../core/net/netstack.c :
  ../../core/./net/netstack.h ../../platform/srf06-cc26xx/./contiki-conf.h :
- ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
+ project-conf.h ../../platform/srf06-cc26xx/srf06/cc26xx/board.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/driverlib/ioc.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_types.h :
  ../../cpu/cc26xx-cc13xx/lib/cc26xxware/inc/hw_chip_def.h :

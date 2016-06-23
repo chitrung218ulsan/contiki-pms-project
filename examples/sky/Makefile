@@ -2,8 +2,8 @@ CONTIKI = ../..
 ifndef TARGET
 TARGET=sky
 endif
-
-all: blink sky-collect #rt-leds test-button tcprudolph0
+APPS = deluge
+all: blink sky-collect test-deluge #rt-leds test-button tcprudolph0
 
 %.tgz: %.ihex
 	mkdir $(basename $<) ; \
